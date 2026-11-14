@@ -22,18 +22,18 @@ import (
 var payload []byte
 
 var tr = map[string]map[string]string{
-	"en": {"title": "FreeCraft Setup", "dir": "Installing to", "eng": "Downloading game engine (Luanti)...", "game": "Installing FreeCraft...", "lnk": "Creating shortcut...", "done": "Done! Start FreeCraft from your desktop.", "fail": "Engine download failed. Install Luanti from luanti.org, then copy %s\\games to its games folder.", "start": "Press Enter to start FreeCraft..."},
-	"de": {"title": "FreeCraft Setup", "dir": "Installation nach", "eng": "Spiel-Engine (Luanti) wird geladen...", "game": "FreeCraft wird installiert...", "lnk": "Verknüpfung wird erstellt...", "done": "Fertig! Starte FreeCraft über den Desktop.", "fail": "Engine-Download fehlgeschlagen. Installiere Luanti von luanti.org und kopiere %s\\games in dessen games-Ordner.", "start": "Enter drücken, um FreeCraft zu starten..."},
-	"fr": {"title": "Installation de FreeCraft", "dir": "Installation dans", "eng": "Téléchargement du moteur (Luanti)...", "game": "Installation de FreeCraft...", "lnk": "Création du raccourci...", "done": "Terminé ! Lancez FreeCraft depuis le bureau.", "fail": "Échec du téléchargement. Installez Luanti (luanti.org), puis copiez %s\\games dans son dossier games.", "start": "Entrée pour lancer FreeCraft..."},
-	"es": {"title": "Instalador de FreeCraft", "dir": "Instalando en", "eng": "Descargando motor (Luanti)...", "game": "Instalando FreeCraft...", "lnk": "Creando acceso directo...", "done": "¡Listo! Inicia FreeCraft desde el escritorio.", "fail": "Falló la descarga. Instala Luanti (luanti.org) y copia %s\\games a su carpeta games.", "start": "Pulsa Enter para iniciar FreeCraft..."},
-	"it": {"title": "Installazione di FreeCraft", "dir": "Installazione in", "eng": "Download del motore (Luanti)...", "game": "Installazione di FreeCraft...", "lnk": "Creazione del collegamento...", "done": "Fatto! Avvia FreeCraft dal desktop.", "fail": "Download non riuscito. Installa Luanti (luanti.org) e copia %s\\games nella sua cartella games.", "start": "Premi Invio per avviare FreeCraft..."},
-	"pt": {"title": "Instalador do FreeCraft", "dir": "Instalando em", "eng": "Baixando o motor (Luanti)...", "game": "Instalando o FreeCraft...", "lnk": "Criando atalho...", "done": "Pronto! Inicie o FreeCraft pela área de trabalho.", "fail": "Falha no download. Instale o Luanti (luanti.org) e copie %s\\games para a pasta games dele.", "start": "Pressione Enter para iniciar o FreeCraft..."},
-	"nl": {"title": "FreeCraft-installatie", "dir": "Installeren in", "eng": "Spel-engine (Luanti) downloaden...", "game": "FreeCraft installeren...", "lnk": "Snelkoppeling maken...", "done": "Klaar! Start FreeCraft vanaf je bureaublad.", "fail": "Download mislukt. Installeer Luanti (luanti.org) en kopieer %s\\games naar de games-map.", "start": "Druk op Enter om FreeCraft te starten..."},
-	"pl": {"title": "Instalator FreeCraft", "dir": "Instalacja w", "eng": "Pobieranie silnika (Luanti)...", "game": "Instalowanie FreeCraft...", "lnk": "Tworzenie skrótu...", "done": "Gotowe! Uruchom FreeCraft z pulpitu.", "fail": "Pobieranie nie powiodło się. Zainstaluj Luanti (luanti.org) i skopiuj %s\\games do jego folderu games.", "start": "Naciśnij Enter, aby uruchomić FreeCraft..."},
-	"ru": {"title": "Установка FreeCraft", "dir": "Установка в", "eng": "Загрузка движка (Luanti)...", "game": "Установка FreeCraft...", "lnk": "Создание ярлыка...", "done": "Готово! Запустите FreeCraft с рабочего стола.", "fail": "Не удалось загрузить движок. Установите Luanti (luanti.org) и скопируйте %s\\games в его папку games.", "start": "Нажмите Enter, чтобы запустить FreeCraft..."},
-	"tr": {"title": "FreeCraft Kurulumu", "dir": "Kurulum yeri", "eng": "Oyun motoru (Luanti) indiriliyor...", "game": "FreeCraft kuruluyor...", "lnk": "Kısayol oluşturuluyor...", "done": "Tamam! FreeCraft'ı masaüstünden başlat.", "fail": "İndirme başarısız. Luanti'yi (luanti.org) kur ve %s\\games klasörünü onun games klasörüne kopyala.", "start": "FreeCraft'ı başlatmak için Enter'a bas..."},
-	"ja": {"title": "FreeCraft セットアップ", "dir": "インストール先", "eng": "ゲームエンジン (Luanti) をダウンロード中...", "game": "FreeCraft をインストール中...", "lnk": "ショートカットを作成中...", "done": "完了！デスクトップから FreeCraft を起動してください。", "fail": "ダウンロードに失敗しました。Luanti (luanti.org) をインストールし、%s\\games を games フォルダにコピーしてください。", "start": "Enterキーで FreeCraft を起動..."},
-	"zh": {"title": "FreeCraft 安装程序", "dir": "安装到", "eng": "正在下载游戏引擎 (Luanti)...", "game": "正在安装 FreeCraft...", "lnk": "正在创建快捷方式...", "done": "完成！请从桌面启动 FreeCraft。", "fail": "下载失败。请安装 Luanti (luanti.org)，然后将 %s\\games 复制到其 games 文件夹。", "start": "按 Enter 启动 FreeCraft..."},
+	"en": {"title": "FreeCraft Setup", "dir": "Installing to", "eng": "Downloading game engine...", "game": "Installing FreeCraft...", "lnk": "Creating shortcut...", "done": "Done! Start FreeCraft from your desktop.", "fail": "Engine download failed. Install Luanti from luanti.org, then copy %s\\games to its games folder.", "start": "Press Enter to start FreeCraft..."},
+	"de": {"title": "FreeCraft Setup", "dir": "Installation nach", "eng": "Spiel-Engine wird geladen...", "game": "FreeCraft wird installiert...", "lnk": "Verknüpfung wird erstellt...", "done": "Fertig! Starte FreeCraft über den Desktop.", "fail": "Engine-Download fehlgeschlagen. Installiere Luanti von luanti.org und kopiere %s\\games in dessen games-Ordner.", "start": "Enter drücken, um FreeCraft zu starten..."},
+	"fr": {"title": "Installation de FreeCraft", "dir": "Installation dans", "eng": "Téléchargement du moteur...", "game": "Installation de FreeCraft...", "lnk": "Création du raccourci...", "done": "Terminé ! Lancez FreeCraft depuis le bureau.", "fail": "Échec du téléchargement. Installez Luanti (luanti.org), puis copiez %s\\games dans son dossier games.", "start": "Entrée pour lancer FreeCraft..."},
+	"es": {"title": "Instalador de FreeCraft", "dir": "Instalando en", "eng": "Descargando motor...", "game": "Instalando FreeCraft...", "lnk": "Creando acceso directo...", "done": "¡Listo! Inicia FreeCraft desde el escritorio.", "fail": "Falló la descarga. Instala Luanti (luanti.org) y copia %s\\games a su carpeta games.", "start": "Pulsa Enter para iniciar FreeCraft..."},
+	"it": {"title": "Installazione di FreeCraft", "dir": "Installazione in", "eng": "Download del motore...", "game": "Installazione di FreeCraft...", "lnk": "Creazione del collegamento...", "done": "Fatto! Avvia FreeCraft dal desktop.", "fail": "Download non riuscito. Installa Luanti (luanti.org) e copia %s\\games nella sua cartella games.", "start": "Premi Invio per avviare FreeCraft..."},
+	"pt": {"title": "Instalador do FreeCraft", "dir": "Instalando em", "eng": "Baixando o motor...", "game": "Instalando o FreeCraft...", "lnk": "Criando atalho...", "done": "Pronto! Inicie o FreeCraft pela área de trabalho.", "fail": "Falha no download. Instale o Luanti (luanti.org) e copie %s\\games para a pasta games dele.", "start": "Pressione Enter para iniciar o FreeCraft..."},
+	"nl": {"title": "FreeCraft-installatie", "dir": "Installeren in", "eng": "Spel-engine downloaden...", "game": "FreeCraft installeren...", "lnk": "Snelkoppeling maken...", "done": "Klaar! Start FreeCraft vanaf je bureaublad.", "fail": "Download mislukt. Installeer Luanti (luanti.org) en kopieer %s\\games naar de games-map.", "start": "Druk op Enter om FreeCraft te starten..."},
+	"pl": {"title": "Instalator FreeCraft", "dir": "Instalacja w", "eng": "Pobieranie silnika...", "game": "Instalowanie FreeCraft...", "lnk": "Tworzenie skrótu...", "done": "Gotowe! Uruchom FreeCraft z pulpitu.", "fail": "Pobieranie nie powiodło się. Zainstaluj Luanti (luanti.org) i skopiuj %s\\games do jego folderu games.", "start": "Naciśnij Enter, aby uruchomić FreeCraft..."},
+	"ru": {"title": "Установка FreeCraft", "dir": "Установка в", "eng": "Загрузка движка...", "game": "Установка FreeCraft...", "lnk": "Создание ярлыка...", "done": "Готово! Запустите FreeCraft с рабочего стола.", "fail": "Не удалось загрузить движок. Установите Luanti (luanti.org) и скопируйте %s\\games в его папку games.", "start": "Нажмите Enter, чтобы запустить FreeCraft..."},
+	"tr": {"title": "FreeCraft Kurulumu", "dir": "Kurulum yeri", "eng": "Oyun motoru indiriliyor...", "game": "FreeCraft kuruluyor...", "lnk": "Kısayol oluşturuluyor...", "done": "Tamam! FreeCraft'ı masaüstünden başlat.", "fail": "İndirme başarısız. Luanti'yi (luanti.org) kur ve %s\\games klasörünü onun games klasörüne kopyala.", "start": "FreeCraft'ı başlatmak için Enter'a bas..."},
+	"ja": {"title": "FreeCraft セットアップ", "dir": "インストール先", "eng": "ゲームエンジン をダウンロード中...", "game": "FreeCraft をインストール中...", "lnk": "ショートカットを作成中...", "done": "完了！デスクトップから FreeCraft を起動してください。", "fail": "ダウンロードに失敗しました。Luanti (luanti.org) をインストールし、%s\\games を games フォルダにコピーしてください。", "start": "Enterキーで FreeCraft を起動..."},
+	"zh": {"title": "FreeCraft 安装程序", "dir": "安装到", "eng": "正在下载游戏引擎...", "game": "正在安装 FreeCraft...", "lnk": "正在创建快捷方式...", "done": "完成！请从桌面启动 FreeCraft。", "fail": "下载失败。请安装 Luanti (luanti.org)，然后将 %s\\games 复制到其 games 文件夹。", "start": "按 Enter 启动 FreeCraft..."},
 }
 
 func lang() string {
@@ -117,7 +117,7 @@ func engine(dst string) error {
 			if err != nil {
 				return err
 			}
-			// Top-Ordner (z. B. luanti-5.x-win64/) entfernen
+			// Top-Ordner entfernen
 			zr, _ := zip.NewReader(bytes.NewReader(data), int64(len(data)))
 			strip := ""
 			if len(zr.File) > 0 {
@@ -166,6 +166,24 @@ func tune(dst string) {
 	}
 }
 
+// Engine-Dateien auf FreeCraft umstellen (Namen, Doku entfernen, Menütexte)
+func rebrand(dst string) {
+	os.Remove(filepath.Join(dst, "bin", "luanti.exe"))
+	os.RemoveAll(filepath.Join(dst, "doc"))
+	os.Remove(filepath.Join(dst, "minetest.conf.example"))
+	filepath.Walk(filepath.Join(dst, "builtin"), func(p string, fi os.FileInfo, err error) error {
+		if err != nil || fi.IsDir() {
+			return nil
+		}
+		if strings.HasSuffix(p, ".lua") || strings.HasSuffix(p, ".txt") {
+			if b, e := os.ReadFile(p); e == nil && bytes.Contains(b, []byte("Luanti")) {
+				os.WriteFile(p, bytes.ReplaceAll(b, []byte("Luanti"), []byte("FreeCraft")), 0o644)
+			}
+		}
+		return nil
+	})
+}
+
 func main() {
 	syscall.NewLazyDLL("kernel32.dll").NewProc("SetConsoleOutputCP").Call(65001)
 	t := tr[lang()]
@@ -189,6 +207,9 @@ func main() {
 	os.MkdirAll(dst, 0o755)
 	fmt.Println(t["eng"])
 	engErr := engine(dst)
+	if engErr == nil {
+		rebrand(dst)
+	}
 	fmt.Println(t["game"])
 	if err := unzip(payload, dst, "FreeCraft/"); err != nil {
 		fmt.Println(err)

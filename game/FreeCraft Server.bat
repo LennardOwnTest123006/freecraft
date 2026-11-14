@@ -43,5 +43,5 @@ echo  Internet            : %NETIP%  Port %PORT%  (UDP-Portfreigabe im Router no
 echo  Beenden: Strg+C
 echo ------------------------------------------
 echo.
-"bin\luanti.exe" --server --gameid freecraft --world "worlds\Server" --config server.conf
+"bin\FreeCraft.exe" --server --gameid freecraft --world "worlds\Server" --config server.conf
 pause

@@ -82,7 +82,7 @@ end)
 core.register_chatcommand("freecraft", {
 	description = S("Info about FreeCraft"),
 	func = function()
-		return true, S("FreeCraft by JumpIn Games – based on Luanti and VoxeLibre (GPLv3).")
+		return true, S("FreeCraft by JumpIn Games – based on VoxeLibre (GPLv3).")
 			.. " notification.email321@gmail.com"
 	end,
 })
@@ -117,7 +117,7 @@ local modes = {}
 for mode, words in pairs(MODE_WORDS) do for _, w in ipairs(words) do modes[w] = mode end end
 local function view_cmd(name, param)
 	local p = core.get_player_by_name(name)
-	if not p or not p.set_camera then return false, S("Not supported by this Luanti version (use F7).") end
+	if not p or not p.set_camera then return false, S("Not supported by this version (use F7).") end
 	local m = modes[param]
 	if not m then return false, S("Usage: /view first | third | any") end
 	p:set_camera({ mode = m })
@@ -162,8 +162,7 @@ local function credits_text()
 		S("Our own mod code (freecraft_extras), the procedurally generated block textures, the logo, the ambient music, the installer and all translations of the extras."),
 		"",
 		core.colorize("#FFDD55", S("Thanks to the projects that helped us")),
-		S("Luanti – the open source voxel engine (LGPL 2.1+) by Perttu Ahola (celeron55) and the Luanti contributors. https://www.luanti.org"),
-		S("VoxeLibre (formerly MineClone2) – the open source game this version is built on (GPLv3). https://content.luanti.org/packages/Wuzzy/mineclone2/"),
+		S("VoxeLibre (formerly MineClone2) – the open source game this version is built on (GPLv3). https://github.com/VoxeLibre/VoxeLibre"),
 		S("Mob textures based on Pixel Perfection by XSSheep (CC BY-SA 4.0); models by 22i (GPLv3)."),
 		"",
 		core.colorize("#FFDD55", S("VoxeLibre contributors")),
@@ -188,8 +187,8 @@ local function settings_formspec(tab, name)
 			lines[#lines+1] = "/" .. (alias_for(c, name)) .. " – " .. (d and d.description or "")
 		end
 		lines[#lines+1] = ""
-		lines[#lines+1] = S("Language: Luanti main menu → Settings → Language. It follows your Windows language automatically.")
-		lines[#lines+1] = S("Quality and graphics: Luanti main menu → Settings. FreeCraft adapts them to your PC at install time.")
+		lines[#lines+1] = S("Language: main menu → Settings → Language. It follows your Windows language automatically.")
+		lines[#lines+1] = S("Quality and graphics: main menu → Settings. FreeCraft adapts them to your PC at install time.")
 		fs = fs .. "label[0.5,1;" .. core.formspec_escape(S("Commands:")) .. "]" ..
 			"textarea[0.4,1.3;10.2,6.4;;;" .. core.formspec_escape(table.concat(lines, "\n")) .. "]"
 	end

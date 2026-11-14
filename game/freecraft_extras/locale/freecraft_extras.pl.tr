@@ -1,8 +1,6 @@
 # textdomain: freecraft_extras
 Welcome to FreeCraft!=Witaj w FreeCraft!
 Info about FreeCraft=Informacje o FreeCraft
-FreeCraft by JumpIn Games – based on Luanti and VoxeLibre (GPLv3).=FreeCraft od JumpIn Games – wolna gra voxelowa oparta na Luanti i VoxeLibre (GPLv3).
-Not supported by this Luanti version (use F7).=Nieobsługiwane w tej wersji Luanti (użyj F7).
 Usage: /view first | third | any=Użycie: /widok pierwsza | trzecia | dowolna
 View: @1=Widok: @1
 Camera: first @= first person, third @= from behind, any @= switch with F7=Kamera: pierwsza @= pierwsza osoba, trzecia @= zza pleców, dowolna @= przełączanie F7
@@ -13,7 +11,6 @@ Contact:=Kontakt:
 Written by us=Wykonane przez nas
 Our own mod code (freecraft_extras), the procedurally generated block textures, the logo, the ambient music, the installer and all translations of the extras.=Nasz własny kod moda (freecraft_extras), samodzielnie wygenerowane tekstury bloków, logo, muzyka w tle, instalator i wszystkie tłumaczenia dodatków.
 Thanks to the projects that helped us=Dziękujemy projektom, które nam pomogły
-Luanti – the open source voxel engine (LGPL 2.1+) by Perttu Ahola (celeron55) and the Luanti contributors. https://www.luanti.org=Luanti – silnik voxelowy open source (LGPL 2.1+) autorstwa Perttu Ahola (celeron55) i współtwórców Luanti. https://www.luanti.org
 VoxeLibre (formerly MineClone2) – the open source game this version is built on (GPLv3). https://content.luanti.org/packages/Wuzzy/mineclone2/=VoxeLibre (dawniej MineClone2) – gra open source, na której oparta jest ta wersja (GPLv3). https://content.luanti.org/packages/Wuzzy/mineclone2/
 Mob textures based on Pixel Perfection by XSSheep (CC BY-SA 4.0); models by 22i (GPLv3).=Tekstury mobów oparte na Pixel Perfection autorstwa XSSheep (CC BY-SA 4.0); modele autorstwa 22i (GPLv3).
 VoxeLibre contributors=Współtwórcy VoxeLibre
@@ -21,8 +18,6 @@ FreeCraft is not affiliated with or endorsed by Mojang or Microsoft. Minecraft i
 License: GPLv3 – see LICENSE.txt and NOTICE.md in the FreeCraft folder.=Licencja: GPLv3 – zobacz LICENSE.txt i NOTICE.md w folderze FreeCraft.
 Settings=Ustawienia
 Credits=Autorzy
-Language: Luanti main menu → Settings → Language. It follows your Windows language automatically.=Język: menu główne Luanti → Ustawienia → Język. Automatycznie dopasowuje się do języka Windows.
-Quality and graphics: Luanti main menu → Settings. FreeCraft adapts them to your PC at install time.=Jakość i grafika: menu główne Luanti → Ustawienia. FreeCraft dopasowuje je do Twojego komputera podczas instalacji.
 Commands:=Polecenia:
 Close=Zamknij
 Settings and credits=Ustawienia i autorzy
