@@ -70,3 +70,7 @@ Licensed under **GPL-3.0** – see [`LICENSE`](LICENSE).
 FreeCraft is not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.
 
 Contact: notification.email321@gmail.com
+
+## Uninstall
+
+Windows Settings → Apps → **FreeCraft** → Uninstall, or run `Uninstall FreeCraft.bat` in `%LOCALAPPDATA%\FreeCraft`, or start `FreeCraft Setup.exe` again and press **U**. You can keep a backup of your worlds on the Desktop.

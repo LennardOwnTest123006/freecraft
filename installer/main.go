@@ -171,6 +171,20 @@ func main() {
 	t := tr[lang()]
 	dst := filepath.Join(os.Getenv("LOCALAPPDATA"), "FreeCraft")
 	fmt.Println(t["title"])
+	if _, err := os.Stat(filepath.Join(dst, "Uninstall FreeCraft.bat")); err == nil {
+		q := "FreeCraft is already installed.  [Enter] = update/reinstall   [U] = uninstall: "
+		if lang() == "de" {
+			q = "FreeCraft ist bereits installiert.  [Enter] = aktualisieren   [U] = deinstallieren: "
+		}
+		fmt.Print(q)
+		a, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		if strings.HasPrefix(strings.ToLower(strings.TrimSpace(a)), "u") {
+			c := exec.Command("cmd", "/c", "start", "", filepath.Join(dst, "Uninstall FreeCraft.bat"))
+			c.Dir = dst
+			c.Start()
+			return
+		}
+	}
 	fmt.Println(t["dir"], dst)
 	os.MkdirAll(dst, 0o755)
 	fmt.Println(t["eng"])
@@ -194,6 +208,11 @@ func main() {
 	os.MkdirAll(filepath.Join(dst, "worlds"), 0o755)
 	ps := mk("FreeCraft", exe, "", dst, 7) + ";" + mk("FreeCraft Server", filepath.Join(dst, "FreeCraft Server.bat"), "", dst, 1) + ";" + mk("FreeCraft Worlds", filepath.Join(dst, "worlds"), "", dst, 1)
 	exec.Command("powershell", "-NoProfile", "-Command", ps).Run()
+	un := filepath.Join(dst, "Uninstall FreeCraft.bat")
+	key := `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\FreeCraft`
+	for _, kv := range [][2]string{{"DisplayName", "FreeCraft"}, {"Publisher", "JumpIn Games"}, {"DisplayVersion", "1.0"}, {"DisplayIcon", ico}, {"InstallLocation", dst}, {"UninstallString", `"` + un + `"`}} {
+		exec.Command("reg", "add", key, "/v", kv[0], "/d", kv[1], "/f").Run()
+	}
 	fmt.Println(t["done"])
 	fmt.Println(t["start"])
 	bufio.NewReader(os.Stdin).ReadString('\n')
