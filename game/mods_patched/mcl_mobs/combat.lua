@@ -761,13 +761,26 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 				if self and self.object then
 					self.frame_speed_multiplier=1
 					self._kb_turn = false
+					-- FreeCraft: in der Luft zieht sich der Mob wieder zum Spieler
+					if hitter and hitter.get_pos and self.attack_type and not self.passive and self.runaway ~= true then
+						local hp, sp = hitter:get_pos(), self.object:get_pos()
+						if hp and sp then
+							local d = vector.new(hp.x - sp.x, 0, hp.z - sp.z)
+							local l = vector.length(d)
+							if l > 0.5 and l < 8 then
+								d = vector.multiply(d, 1 / l)
+								self:turn_in_direction(d.x, d.z, 1)
+								self.object:add_velocity(vector.new(d.x * 5, 0.6, d.z * 5))
+							end
+						end
+					end
 				end
 			end)
 			kb = math.min(kb, 2.2) * 6 -- FreeCraft: sanfter Rueckstoss derived constant
 			self:set_velocity(0)
 			self.object:add_velocity(vector_new(dir.x * kb, up, dir.z * kb ))
 
-			self.pause_timer = 0.25
+			self.pause_timer = 0.12
 		end
 	end -- END if damage
 

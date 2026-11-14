@@ -81,7 +81,7 @@ end)
 core.register_chatcommand("freecraft", {
 	description = S("Info about FreeCraft"),
 	func = function()
-		return true, S("FreeCraft by JumpIn Games – based on VoxeLibre (GPLv3).")
+		return true, S("FreeCraft by JumpIn Games – uses VoxeLibre (GPLv3) as scaffolding for some parts.")
 			.. " notification.email321@gmail.com"
 	end,
 })
@@ -208,7 +208,7 @@ local function credits_text()
 		S("Our own mod code (freecraft_extras), the procedurally generated block textures, the logo, the ambient music, the installer and all translations of the extras."),
 		"",
 		core.colorize("#FFDD55", S("Thanks to the projects that helped us")),
-		S("VoxeLibre (formerly MineClone2) – the open source game this version is built on (GPLv3). https://github.com/VoxeLibre/VoxeLibre"),
+		S("VoxeLibre (formerly MineClone2) – used as scaffolding and helper for some parts (GPLv3). https://github.com/VoxeLibre/VoxeLibre"),
 		S("Mob textures based on Pixel Perfection by XSSheep (CC BY-SA 4.0); models by 22i (GPLv3)."),
 		"",
 		core.colorize("#FFDD55", S("VoxeLibre contributors")),

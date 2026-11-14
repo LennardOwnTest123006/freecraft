@@ -140,6 +140,62 @@ index 0e96ac0..312dda9 100644
  #    Whether to mute sounds. You can unmute sounds at any time.
  #    In-game, you can toggle the mute state with the mute key or by using the
  #    pause menu.
+diff --git a/irr/src/CGUIButton.cpp b/irr/src/CGUIButton.cpp
+index 9cb550f..c39f786 100644
+--- a/irr/src/CGUIButton.cpp
++++ b/irr/src/CGUIButton.cpp
+@@ -9,6 +9,7 @@
+ #include "IVideoDriver.h"
+ #include "IGUIFont.h"
+ #include "os.h"
++#include <cmath>
+ 
+ namespace gui
+ {
+@@ -270,10 +271,39 @@ void CGUIButton::draw()
+ 			rect.UpperLeftCorner.Y += skin->getSize(EGDS_BUTTON_PRESSED_TEXT_OFFSET_Y);
+ 		}
+ 
+-		if (font)
+-			font->draw(Text.c_str(), rect,
+-					getActiveColor(),
+-					true, true, &AbsoluteClippingRect);
++		if (font) {
++			// FreeCraft: text that is too long scrolls left/right so it can be read
++			const s32 pad = 6;
++			core::dimension2d<u32> td = font->getDimension(Text.c_str());
++			s32 avail = rect.getWidth() - 2 * pad;
++			if (avail > 8 && (s32)td.Width > avail) {
++				const s32 overflow = (s32)td.Width - avail;
++				const f32 speed = 32.0f; // pixels per second (comfortable reading speed)
++				const f32 pause = 1.2f;  // seconds at both ends
++				const f32 travel = overflow / speed;
++				const f32 period = 2.0f * (travel + pause);
++				f32 t = fmodf(os::Timer::getTime() / 1000.0f, period);
++				f32 off;
++				if (t < pause)
++					off = 0.0f;
++				else if (t < pause + travel)
++					off = (t - pause) * speed;
++				else if (t < 2.0f * pause + travel)
++					off = (f32)overflow;
++				else
++					off = overflow - (t - 2.0f * pause - travel) * speed;
++				core::rect<s32> clip(rect.UpperLeftCorner.X + pad, rect.UpperLeftCorner.Y,
++						rect.LowerRightCorner.X - pad, rect.LowerRightCorner.Y);
++				clip.clipAgainst(AbsoluteClippingRect);
++				core::rect<s32> trect(rect.UpperLeftCorner.X + pad - (s32)off, rect.UpperLeftCorner.Y,
++						rect.UpperLeftCorner.X + pad - (s32)off + (s32)td.Width + 2, rect.LowerRightCorner.Y);
++				font->draw(Text.c_str(), trect, getActiveColor(), false, true, &clip);
++			} else {
++				font->draw(Text.c_str(), rect,
++						getActiveColor(),
++						true, true, &AbsoluteClippingRect);
++			}
++		}
+ 	}
+ 
+ 	IGUIElement::draw();
 diff --git a/irr/src/CIrrDeviceSDL.cpp b/irr/src/CIrrDeviceSDL.cpp
 index 38a1bde..28dcf89 100644
 --- a/irr/src/CIrrDeviceSDL.cpp
@@ -153,9 +209,6 @@ index 38a1bde..28dcf89 100644
  
  		// Disabling the compositor is not a good idea in windowed mode.
  		// see <https://github.com/luanti-org/luanti/issues/14596>
-diff --git a/misc/luanti-icon.ico b/misc/luanti-icon.ico
-index 82af67b..f95e431 100644
-Binary files a/misc/luanti-icon.ico and b/misc/luanti-icon.ico differ
 diff --git a/misc/winresource.rc b/misc/winresource.rc
 index d9b4603..4e0ce01 100644
 --- a/misc/winresource.rc
@@ -211,7 +264,7 @@ index 0a315b0..ad4e888 100644
  			" [" + driver_name + "]";
  
 diff --git a/src/client/game.cpp b/src/client/game.cpp
-index f901556..aed16e3 100644
+index f901556..4702871 100644
 --- a/src/client/game.cpp
 +++ b/src/client/game.cpp
 @@ -902,7 +902,7 @@ bool Game::createClient(const GameStartData &start_data)
@@ -239,7 +292,54 @@ index f901556..aed16e3 100644
  	auto color_for = [](LogLevel level) -> const char* {
  		switch (level) {
  		case LL_ERROR  : return "\x1b(c@#F00)"; // red
-@@ -2968,8 +2977,17 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
+@@ -2565,11 +2574,46 @@ void Game::updateChat(f32 dtime)
+ 	m_game_ui->updateChatSize();
+ }
+ 
++struct FcWatch {
++	bool active = false;
++	float timer = 0.0f;
++	v3s16 pos1, pos2;
++	MapNode n1, n2;
++	std::string item;
++	u16 count = 0;
++};
++static FcWatch g_fc_watch;
++
+ void Game::updateCamera(f32 dtime)
+ {
+ 	ClientEnvironment &env = client->getEnv();
+ 	LocalPlayer *player = env.getLocalPlayer();
+ 
++	// FreeCraft: hand animation only if the right click really did something
++	if (g_fc_watch.active && player) {
++		g_fc_watch.timer += dtime;
++		ClientMap &fcmap = env.getClientMap();
++		bool changed = false;
++		bool ok1 = true, ok2 = true;
++		MapNode a = fcmap.getNode(g_fc_watch.pos1, &ok1);
++		MapNode b = fcmap.getNode(g_fc_watch.pos2, &ok2);
++		if ((ok1 && (a.getContent() != g_fc_watch.n1.getContent() || a.param2 != g_fc_watch.n1.param2)) ||
++				(ok2 && (b.getContent() != g_fc_watch.n2.getContent() || b.param2 != g_fc_watch.n2.param2)))
++			changed = true;
++		ItemStack fc_sel, fc_hand;
++		player->getWieldedItem(&fc_sel, &fc_hand);
++		if (fc_sel.name != g_fc_watch.item || fc_sel.count != g_fc_watch.count)
++			changed = true;
++		if (isMenuActive())
++			changed = true;
++		if (changed) {
++			camera->setDigging(1);
++			g_fc_watch.active = false;
++		} else if (g_fc_watch.timer > 0.5f) {
++			g_fc_watch.active = false;
++		}
++	}
++
+ 	// For interaction purposes, get info about the held item
+ 	ItemStack playeritem, hand;
+ 	{
+@@ -2968,8 +3012,16 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
  		runData.repeat_place_timer = 0;
  		infostream << "Place button pressed while looking at ground" << std::endl;
  
@@ -253,18 +353,28 @@ index f901556..aed16e3 100644
 +				(meta && !meta->getString("formspec").empty());
 +			if (fc_rc && !isKeyDown(KeyType::SNEAK))
 +				fc_anim = true;
-+			else if (!selected_item.empty() && fc_def.node_placement_prediction.empty())
-+				fc_anim = true;
++			(void)fc_def;
 +		}
  
  		soundmaker->m_player_rightpunch_sound = SoundSpec();
  
-@@ -2981,6 +2999,9 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
+@@ -2981,6 +3033,20 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
  		bool placed = nodePlacement(def, selected_item, nodepos, neighborpos,
  			pointed, meta);
  
-+		if (placed || fc_anim)
++		if (placed || fc_anim) {
 +			camera->setDigging(1);
++		} else if (!selected_item.empty()) {
++			// Server-side placement (string, redstone, ...): watch for a visible effect
++			g_fc_watch.active = true;
++			g_fc_watch.timer = 0.0f;
++			g_fc_watch.pos1 = nodepos;
++			g_fc_watch.pos2 = neighborpos;
++			g_fc_watch.n1 = map.getNode(nodepos);
++			g_fc_watch.n2 = map.getNode(neighborpos);
++			g_fc_watch.item = selected_item.name;
++			g_fc_watch.count = selected_item.count;
++		}
 +
  		if (placed && client->modsLoaded())
  			client->getScript()->on_placenode(pointed, def);
@@ -497,3 +607,74 @@ index d0e0562..00eb7b1 100644
  	settings->setDefault("keymap_camera_yaw_left", "GAMEPAD_AXIS_MINUS_2"); // Right Joystick
  	settings->setDefault("keymap_camera_yaw_right", "GAMEPAD_AXIS_PLUS_2"); // Right Joystick
  	settings->setDefault("keymap_camera_pitch_up", "GAMEPAD_AXIS_MINUS_3"); // Right Joystick
+diff --git a/src/gettext.cpp b/src/gettext.cpp
+index 915ac09..7bbc4ba 100644
+--- a/src/gettext.cpp
++++ b/src/gettext.cpp
+@@ -231,6 +231,39 @@ void init_gettext(const char *path, const std::string &configured_language,
+ 			<< setlocale(LC_ALL, 0) << std::endl;
+ }
+ 
++void gettext_apply_language(const std::string &lang, const std::string &path)
++{
++#if USE_GETTEXT
++	if (!lang.empty()) {
++		setenv("LANGUAGE", lang.c_str(), 1);
++#ifdef _WIN32
++		SetEnvironmentVariableA("LANGUAGE", lang.c_str());
++#endif
++		setlocale(LC_ALL, "");
++	} else {
++		unsetenv("LANGUAGE");
++#ifdef _WIN32
++		SetEnvironmentVariableA("LANGUAGE", nullptr);
++#endif
++		setlocale(LC_ALL, "");
++	}
++#ifdef _WIN32
++	if (getenv("LANGUAGE") != 0)
++		setlocale(LC_ALL, getenv("LANGUAGE"));
++#endif
++	std::string name = lowercase(PROJECT_NAME);
++	// Changing the bound directory makes gettext drop its catalog cache
++	std::string alt = path + "/./";
++	bindtextdomain(name.c_str(), alt.c_str());
++	bindtextdomain(name.c_str(), path.c_str());
++	textdomain(name.c_str());
++#ifdef _WIN32
++	bind_textdomain_codeset(name.c_str(), "UTF-8");
++#endif
++	setlocale(LC_NUMERIC, "C");
++#endif
++}
++
+ std::string gettext_get_lang_code()
+ {
+ 	/* TRANSLATORS: DO NOT TRANSLATE THIS LITERALLY!
+diff --git a/src/gettext.h b/src/gettext.h
+index 0c608fb..fd83c24 100644
+--- a/src/gettext.h
++++ b/src/gettext.h
+@@ -106,3 +106,6 @@ inline std::string fmtgettext(const char *format, Args&&... args)
+ 
+ /// Returns the current language code from gettext, falling back to "en" if not translated.
+ std::string gettext_get_lang_code();
++
++// FreeCraft: apply a changed language setting immediately (no restart)
++void gettext_apply_language(const std::string &lang, const std::string &path);
+diff --git a/src/main.cpp b/src/main.cpp
+index 71809c9..a8f372c 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -797,6 +797,11 @@ static bool init_common(const Settings &cmd_args, int argc, char *argv[])
+ 	init_gettext(porting::path_locale.c_str(),
+ 		g_settings->get("language"), argc, argv);
+ 
++	// FreeCraft: language changes apply immediately
++	g_settings->registerChangedCallback("language", [](const std::string &, void *) {
++		gettext_apply_language(g_settings->get("language"), porting::path_locale);
++	}, nullptr);
++
+ 	return true;
+ }
+ 

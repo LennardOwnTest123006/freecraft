@@ -8,6 +8,7 @@ echo.
 set K=J
 set /p K=Welten behalten (Backup auf dem Desktop)? / Keep worlds (backup on Desktop)? [J/N]: 
 taskkill /f /im FreeCraft.exe >nul 2>&1
+taskkill /f /im FreeCraft-Server.exe >nul 2>&1
 timeout /t 2 /nobreak >nul
 if /i "%K%"=="J" (
   if exist "%D%worlds" xcopy /e /i /y /q "%D%worlds" "%USERPROFILE%\Desktop\FreeCraft-Welten-Backup" >nul

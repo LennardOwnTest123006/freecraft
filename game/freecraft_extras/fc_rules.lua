@@ -188,3 +188,44 @@ core.register_on_mods_loaded(function()
 		end
 	end
 end)
+
+-- ===== Faden (String) ist platzierbar wie in Minecraft =====
+core.register_node("freecraft_extras:string_node", {
+	description = S("String"),
+	drawtype = "nodebox",
+	node_box = { type = "fixed", fixed = { -0.5, -0.5, -0.03, 0.5, -0.44, 0.03 } },
+	tiles = { "mcl_mobitems_string.png" },
+	inventory_image = "mcl_mobitems_string.png",
+	wield_image = "mcl_mobitems_string.png",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	walkable = false,
+	buildable_to = false,
+	floodable = true,
+	drop = "mcl_mobitems:string",
+	groups = { dig_immediate = 3, attached_node = 1, dig_by_water = 1, destroy_by_lava_flow = 1, not_in_creative_inventory = 1 },
+	sounds = mcl_sounds and mcl_sounds.node_sound_leaves_defaults() or nil,
+	_mcl_blast_resistance = 0,
+	_mcl_hardness = 0,
+})
+core.override_item("mcl_mobitems:string", {
+	on_place = function(itemstack, placer, pointed)
+		if not placer or not pointed or pointed.type ~= "node" then return itemstack end
+		local under = core.get_node(pointed.under)
+		local udef = core.registered_nodes[under.name]
+		if udef and udef.on_rightclick and not placer:get_player_control().sneak then
+			return udef.on_rightclick(pointed.under, under, placer, itemstack, pointed) or itemstack
+		end
+		local pos = (udef and udef.buildable_to) and pointed.under or pointed.above
+		local n = core.get_node(pos)
+		local ndef = core.registered_nodes[n.name]
+		if not (ndef and ndef.buildable_to) then return itemstack end
+		local below = core.get_node({ x = pos.x, y = pos.y - 1, z = pos.z })
+		local bdef = core.registered_nodes[below.name]
+		if not (bdef and bdef.walkable) then return itemstack end
+		core.set_node(pos, { name = "freecraft_extras:string_node", param2 = core.dir_to_facedir(placer:get_look_dir()) })
+		if not core.is_creative_enabled(placer:get_player_name()) then itemstack:take_item() end
+		return itemstack
+	end,
+})
