@@ -8,7 +8,6 @@ local ALIAS = {
 	home       = { "home", "zuhause", "maison", "casa", "casa", "casa", "thuis", "dom", "дом", "ev", "ホーム", "回家" },
 	sethome    = { "sethome", "heimsetzen", "defmaison", "fijarcasa", "impostacasa", "definircasa", "zetthuis", "ustawdom", "задатьдом", "evayarla", "ホーム設定", "设置家" },
 	spawn      = { "spawn", "anfang", "apparition", "aparecer", "inizio", "inicio", "beginpunt", "start", "спавн", "dogma", "スポーン", "出生点" },
-	back       = { "back", "zurueck", "retour", "volver", "indietro", "voltar", "terug", "wroc", "назад", "geri", "戻る", "返回" },
 	day        = { "day", "tag", "jour", "dia", "giorno", "dia", "dag", "dzien", "день", "gun", "昼", "白天" },
 	night      = { "night", "nacht", "nuit", "noche", "notte", "noite", "nacht", "noc", "ночь", "gece", "夜", "夜晚" },
 	skins      = { "skins", "figuren", "apparences", "aspectos", "aspetti", "aparencias", "uiterlijk", "skiny", "скины", "kostumler", "スキン", "皮肤" },
@@ -24,7 +23,7 @@ local MODE_WORDS = {
 	any   = { "any", "frei", "libre", "libre", "libera", "livre", "vrij", "dowolna", "свободно", "serbest", "自由", "自由" },
 }
 -- Reihenfolge für Vorschläge (wichtigste zuerst)
-local PRIORITY = { "home", "sethome", "spawn", "back", "skins", "settings", "credits", "skinupload", "view", "day", "night" }
+local PRIORITY = { "home", "sethome", "spawn", "skins", "settings", "credits", "skinupload", "view", "day", "night" }
 
 local function lang_of(name)
 	local info = core.get_player_information and core.get_player_information(name)
@@ -130,16 +129,63 @@ core.register_chatcommand("view", def)
 -- (Alias in allen Sprachen wird weiter unten registriert)
 
 -- Leise Hintergrundmusik (eigene Komposition, eigener Code, GPLv3)
+-- Lautstaerke: Einstellungen -> Ton -> "Music volume" (0 = stumm) oder /music 0-100
+local music_handle = {}
+local function music_vol(p)
+	local own = p:get_meta():get_string("freecraft:music")
+	local v = tonumber(own ~= "" and own or core.settings:get("freecraft_music_volume") or 0.5) or 0.5
+	return math.max(0, math.min(1, v))
+end
+function freecraft_music_factor(p) return music_vol(p) * 2 end
+local last_vol = {}
 local function play_music(name)
 	local p = core.get_player_by_name(name)
-	if not p then return end
-	core.sound_play("freecraft_ambient", { to_player = name, gain = 0.12 }, true)
+	if not p then music_handle[name] = nil return end
+	local v = music_vol(p)
+	if v > 0 then
+		music_handle[name] = { h = core.sound_play("freecraft_ambient", { to_player = name, gain = 0.24 * v }), v = v }
+	end
 	core.after(180 + math.random(0, 120), play_music, name)
 end
 core.register_on_joinplayer(function(player)
 	core.after(20, play_music, player:get_player_name())
 end)
-
+core.register_on_leaveplayer(function(player) music_handle[player:get_player_name()] = nil end)
+local mtimer = 0
+core.register_globalstep(function(dtime)
+	mtimer = mtimer + dtime
+	if mtimer < 1.5 then return end
+	mtimer = 0
+	for _, p in ipairs(core.get_connected_players()) do
+		local n, v = p:get_player_name(), music_vol(p)
+		if last_vol[n] ~= v then
+			last_vol[n] = v
+			if freecraft_music_refresh then freecraft_music_refresh(p) end
+		end
+	end
+	for name, m in pairs(music_handle) do
+		local p = core.get_player_by_name(name)
+		if p then
+			local v = music_vol(p)
+			if v ~= m.v then
+				m.v = v
+				if v <= 0 then core.sound_stop(m.h) else core.sound_fade(m.h, 2, 0.24 * v) end
+			end
+		end
+	end
+end)
+core.register_chatcommand("music", {
+	params = "0-100",
+	description = S("Music volume (0 = off)"),
+	func = function(name, param)
+		local p = core.get_player_by_name(name)
+		local n = tonumber(param)
+		if not p or not n then return false, "/music 0-100" end
+		n = math.max(0, math.min(100, n))
+		p:get_meta():set_string("freecraft:music", tostring(n / 100))
+		return true, S("Music volume (0 = off)") .. ": " .. n
+	end,
+})
 
 -- ===== Einstellungen & Credits =====
 local function read_file(path)
@@ -182,7 +228,7 @@ local function settings_formspec(tab, name)
 		fs = fs .. "textarea[0.4,0.6;10.2,7.4;;;" .. core.formspec_escape(credits_text()) .. "]"
 	else
 		local lines = {}
-		for _, c in ipairs({ "home", "sethome", "spawn", "back", "skins", "skinupload", "settings", "credits", "view", "day", "night" }) do
+		for _, c in ipairs({ "home", "sethome", "spawn", "skins", "skinupload", "settings", "credits", "view", "day", "night" }) do
 			local d = core.registered_chatcommands[c]
 			lines[#lines+1] = "/" .. (alias_for(c, name)) .. " – " .. (d and d.description or "")
 		end
@@ -389,7 +435,7 @@ core.register_on_player_receive_fields(function(player, formname, fields)
 	end)
 end)
 
--- ===== Komfort-Befehle: /sethome, /home, /spawn, /day, /night, /back =====
+-- ===== Komfort-Befehle: /sethome, /home, /spawn, /day, /night =====
 local function fmt_pos(p) return ("%d %d %d"):format(math.floor(p.x + .5), math.floor(p.y + .5), math.floor(p.z + .5)) end
 
 core.register_chatcommand("sethome", {
@@ -435,26 +481,6 @@ core.register_chatcommand("night", {
 	description = S("Set the time to night"),
 	privs = { settime = true },
 	func = function() core.set_timeofday(0.0); return true, S("It is night.") end,
-})
-
--- Todesort merken: /back
-core.register_on_dieplayer(function(player)
-	local p = player:get_pos()
-	player:get_meta():set_string("freecraft:death", core.pos_to_string(p))
-	core.chat_send_player(player:get_player_name(),
-		core.colorize("#FF8888", S("You died at @1 – use /back to return.", fmt_pos(p))))
-end)
-
-core.register_chatcommand("back", {
-	description = S("Teleport to your last death position"),
-	func = function(name)
-		local p = core.get_player_by_name(name)
-		if not p then return false end
-		local d = core.string_to_pos(p:get_meta():get_string("freecraft:death"))
-		if not d then return false, S("No death position saved.") end
-		p:set_pos(d)
-		return true, S("Back at your last death position.")
-	end,
 })
 
 
@@ -509,3 +535,5 @@ core.register_on_chatcommand(function(name, cmd, param)
 	core.chat_send_player(name, table.concat(lines, "\n"))
 	return true
 end)
+
+dofile(core.get_modpath("freecraft_extras") .. "/fc_rules.lua")

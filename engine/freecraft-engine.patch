@@ -1,0 +1,499 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bead547..24e8874 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,7 +5,7 @@ endif()
+ 
+ # This can be read from ${PROJECT_NAME} after project() is called
+ project(luanti)
+-set(PROJECT_NAME_CAPITALIZED "Luanti")
++set(PROJECT_NAME_CAPITALIZED "FreeCraft")
+ 
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+diff --git a/builtin/common/settings/dlg_settings.lua b/builtin/common/settings/dlg_settings.lua
+index f9e8d5c..d2db978 100644
+--- a/builtin/common/settings/dlg_settings.lua
++++ b/builtin/common/settings/dlg_settings.lua
+@@ -9,6 +9,16 @@ local component_funcs =  dofile(path .. "components.lua")
+ local shadows_component =  dofile(path .. "shadows_component.lua")
+ 
+ local loaded = false
++-- FreeCraft: Stil und Credits
++if not rawget(_G, "fc_T") then
++	pcall(dofile, core.get_builtin_path() .. "mainmenu" .. DIR_DELIM .. "fc_i18n.lua")
++end
++local function fc_tex(n) return core.formspec_escape(defaulttexturedir .. n) end
++local FC_BTN = "bgimg=" .. fc_tex("fc_btn.png") .. ";bgimg_hovered=" .. fc_tex("fc_btn_h.png") ..
++	";bgimg_pressed=" .. fc_tex("fc_btn_p.png") .. ";bgimg_middle=8;border=false;textcolor=#ffffff"
++local FC_SEL = "bgimg=" .. fc_tex("fc_btn_go.png") .. ";bgimg_hovered=" .. fc_tex("fc_btn_go_h.png") ..
++	";bgimg_pressed=" .. fc_tex("fc_btn_p.png") .. ";bgimg_middle=8;border=false;textcolor=#ffffff"
++
+ local info_icon_path = core.formspec_escape(defaulttexturedir .. "settings_info.png")
+ local reset_icon_path = core.formspec_escape(defaulttexturedir .. "settings_reset.png")
+ local all_pages = {}
+@@ -264,6 +274,25 @@ local function load()
+ 		-- TRANSLATORS: Touchscreen gesture
+ 		["long_tap"] = fgettext_ne("Long tap"),
+ 	}
++
++	-- FreeCraft: Credits-Seite
++	add_page({
++		id = "fc_credits",
++		title = "Credits",
++		content = {
++			{
++				full_width = true,
++				get_formspec = function(self, avail_w)
++					local text = rawget(_G, "fc_T") and fc_T("credits_text") or
++						"FreeCraft 1.0\nby JumpIn Games\n\nBased on VoxeLibre (GPLv3)."
++					text = text:gsub("\\n", "\n")
++					return ("style_type[textarea;textcolor=#e8f4ff;border=false]textarea[0,0.2;%f,8;;;%s]"):format(
++						avail_w, core.formspec_escape(text)), 8.4
++				end,
++			},
++		},
++	})
++	table.insert(all_pages, 2, table.remove(all_pages))
+ end
+ 
+ 
+@@ -536,26 +565,29 @@ local function get_formspec(dialogdata)
+ 		"formspec_version[6]",
+ 		"size[", tostring(tabsize.width), ",", tostring(tabsize.height + extra_h), "]",
+ 		core.settings:get_bool("touch_gui") and "padding[0.01,0.01]" or "",
+-		"bgcolor[#0000]",
++		"bgcolor[#00000000;true;#05081288]",
+ 
+ 		-- HACK: this is needed to allow resubmitting the same formspec
+ 		formspec_show_hack and " " or "",
+ 
+-		"box[0,0;", tostring(tabsize.width), ",", tostring(tabsize.height), ";#0000008C]",
++		"background9[0,0;", tostring(tabsize.width), ",", tostring(tabsize.height), ";", fc_tex("fc_panel.png"), ";false;14]",
++		"style_type[button;", FC_BTN, "]",
++		"style_type[field;bgcolor=#070a16;textcolor=#ffffff;border=true]",
++		"style_type[dropdown;bgcolor=#070a16;textcolor=#ffffff]",
+ 
+ 		("button[0,%f;%f,0.8;back;%s]"):format(
+ 				tabsize.height + 0.2, back_w,
+ 				-- TRANSLATORS: Button text to go back
+ 				fgettext("Back")),
+ 
+-		("box[%f,%f;%f,0.8;#0000008C]"):format(
++		("box[%f,%f;%f,0.8;#0a1024CC]"):format(
+ 			back_w + 0.2, tabsize.height + 0.2, checkbox_w),
+ 		("checkbox[%f,%f;show_technical_names;%s;%s]"):format(
+ 			back_w + 2*0.2, tabsize.height + 0.6,
+ 			-- TRANSLATORS: Checkbox that toggles displaying the technical setting names
+ 			fgettext("Show technical names"), tostring(show_technical_names)),
+ 
+-		("box[%f,%f;%f,0.8;#0000008C]"):format(
++		("box[%f,%f;%f,0.8;#0a1024CC]"):format(
+ 			back_w + 2*0.2 + checkbox_w, tabsize.height + 0.2, checkbox_w),
+ 		("checkbox[%f,%f;show_advanced;%s;%s]"):format(
+ 			back_w + 3*0.2 + checkbox_w, tabsize.height + 0.6,
+@@ -574,8 +606,6 @@ local function get_formspec(dialogdata)
+ 		"container_end[]",
+ 		("scroll_container[0.25,1.25;%f,%f;leftscroll;vertical;0.1;0]"):format(
+ 			left_pane_width, tabsize.height - 1.5),
+-		"style_type[button;border=false;bgcolor=#3333]",
+-		"style_type[button:hover;border=false;bgcolor=#6663]",
+ 	}
+ 
+ 	local y = 0
+@@ -583,12 +613,13 @@ local function get_formspec(dialogdata)
+ 	for _, other_page in ipairs(filtered_pages) do
+ 		if other_page.section ~= last_section then
+ 			fs[#fs + 1] = ("label[0.1,%f;%s]"):format(
+-				y + 0.41, core.colorize("#ff0", fgettext(other_page.section)))
++				y + 0.41, core.colorize("#7fe9ff", fgettext(other_page.section)))
+ 			last_section = other_page.section
+ 			y = y + 0.82
+ 		end
+-		fs[#fs + 1] = ("box[0,%f;%f,0.8;%s]"):format(
+-			y, left_pane_width-left_pane_padding, other_page.id == page_id and "#467832FF" or "#3339")
++		if other_page.id == page_id then
++			fs[#fs + 1] = "style[page_" .. other_page.id .. ";" .. FC_SEL .. "]"
++		end
+ 		fs[#fs + 1] = ("button[0,%f;%f,0.8;page_%s;%s]")
+ 			:format(y, left_pane_width-left_pane_padding, other_page.id, fgettext(other_page.title))
+ 		y = y + 0.82
+@@ -608,7 +639,6 @@ local function get_formspec(dialogdata)
+ 				left_pane_width + 0.25, scrollbar_w, tabsize.height - 1.5, dialogdata.leftscroll or 0)
+ 	end
+ 
+-	fs[#fs + 1] = "style_type[button;border=;bgcolor=]"
+ 
+ 	if not dialogdata.components then
+ 		dialogdata.components = page and build_page_components(page) or {}
+diff --git a/builtin/settingtypes.txt b/builtin/settingtypes.txt
+index 0e96ac0..312dda9 100644
+--- a/builtin/settingtypes.txt
++++ b/builtin/settingtypes.txt
+@@ -865,6 +865,9 @@ sound_volume (Volume) float 0.8 0.0 1.0
+ #    Volume multiplier when the window is unfocused.
+ sound_volume_unfocused (Volume when unfocused) float 0.3 0.0 1.0
+ 
++#    Music volume. 0 = music off.
++freecraft_music_volume (Music volume) float 0.5 0.0 1.0
++
+ #    Whether to mute sounds. You can unmute sounds at any time.
+ #    In-game, you can toggle the mute state with the mute key or by using the
+ #    pause menu.
+diff --git a/irr/src/CIrrDeviceSDL.cpp b/irr/src/CIrrDeviceSDL.cpp
+index 38a1bde..28dcf89 100644
+--- a/irr/src/CIrrDeviceSDL.cpp
++++ b/irr/src/CIrrDeviceSDL.cpp
+@@ -364,6 +364,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
+ 
+ 		// Luanti has its own signal handler
+ 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
++		// FreeCraft: erster Klick auf ein nicht aktives Fenster zaehlt sofort
++		SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+ 
+ 		// Disabling the compositor is not a good idea in windowed mode.
+ 		// see <https://github.com/luanti-org/luanti/issues/14596>
+diff --git a/misc/luanti-icon.ico b/misc/luanti-icon.ico
+index 82af67b..f95e431 100644
+Binary files a/misc/luanti-icon.ico and b/misc/luanti-icon.ico differ
+diff --git a/misc/winresource.rc b/misc/winresource.rc
+index d9b4603..4e0ce01 100644
+--- a/misc/winresource.rc
++++ b/misc/winresource.rc
+@@ -38,14 +38,14 @@ BEGIN
+     BEGIN
+         BLOCK "040904b0"
+     BEGIN
+-        VALUE "CompanyName", PROJECT_NAME_C " community"
+-        VALUE "FileDescription", PROJECT_NAME_C " engine"
+-        VALUE "FileVersion", VERSION_STRING
+-        VALUE "InternalName", PROJECT_NAME
+-        VALUE "OriginalFilename", PROJECT_NAME ".exe"
++        VALUE "CompanyName", "JumpIn Games"
++        VALUE "FileDescription", "FreeCraft"
++        VALUE "FileVersion", "1.0"
++        VALUE "InternalName", "FreeCraft"
++        VALUE "OriginalFilename", "FreeCraft.exe"
+         VALUE "LegalCopyright", "(c) 2010-2026 Perttu Ahola (celeron55) and contributors"
+         VALUE "ProductName", PROJECT_NAME_C
+-        VALUE "ProductVersion", PRODUCT_VERSION_STRING
++        VALUE "ProductVersion", "1.0"
+     END
+ END
+ BLOCK "VarFileInfo"
+diff --git a/src/client/camera.cpp b/src/client/camera.cpp
+index a1b9848..a96e68f 100644
+--- a/src/client/camera.cpp
++++ b/src/client/camera.cpp
+@@ -646,10 +646,9 @@ void Camera::drawWieldedTool(core::matrix4* translation)
+ 
+ void Camera::toggleCameraMode()
+ {
++	// FreeCraft: nur zwischen Ich-Ansicht und Dritter Person wechseln
+ 	if (m_camera_mode == CAMERA_MODE_FIRST)
+ 		m_camera_mode = CAMERA_MODE_THIRD;
+-	else if (m_camera_mode == CAMERA_MODE_THIRD)
+-		m_camera_mode = CAMERA_MODE_THIRD_FRONT;
+ 	else
+ 		m_camera_mode = CAMERA_MODE_FIRST;
+ }
+diff --git a/src/client/clientlauncher.cpp b/src/client/clientlauncher.cpp
+index 0a315b0..ad4e888 100644
+--- a/src/client/clientlauncher.cpp
++++ b/src/client/clientlauncher.cpp
+@@ -187,7 +187,7 @@ bool ClientLauncher::run(const GameParams &game_params, const Settings &cmd_args
+ 		// Set the window caption
+ 		auto driver_name = m_rendering_engine->getVideoDriver()->getName();
+ 		std::string caption = std::string(PROJECT_NAME_C) +
+-			" " + g_version_hash +
++			" 1.0" +
+ 			" [" + gettext("Main Menu") + "]" +
+ 			" [" + driver_name + "]";
+ 
+diff --git a/src/client/game.cpp b/src/client/game.cpp
+index f901556..aed16e3 100644
+--- a/src/client/game.cpp
++++ b/src/client/game.cpp
+@@ -902,7 +902,7 @@ bool Game::createClient(const GameStartData &start_data)
+ 	 */
+ 	auto driver_name = driver->getName();
+ 	std::string str = std::string(PROJECT_NAME_C) +
+-			" " + g_version_hash + " [";
++			" 1.0 [";
+ 	str += simple_singleplayer_mode ? gettext("Singleplayer")
+ 			: gettext("Multiplayer");
+ 	str += "] [";
+@@ -2526,6 +2526,15 @@ void Game::processClientEvents(CameraOrientation *cam)
+ 
+ void Game::updateChat(f32 dtime)
+ {
++	// FreeCraft: Chat alle 8 Minuten leeren
++	static f32 fc_chat_timer = 0.0f;
++	fc_chat_timer += dtime;
++	if (fc_chat_timer >= 480.0f) {
++		fc_chat_timer = 0.0f;
++		chat_backend->clearRecentChat();
++		chat_backend->getConsoleBuffer().clear();
++	}
++
+ 	auto color_for = [](LogLevel level) -> const char* {
+ 		switch (level) {
+ 		case LL_ERROR  : return "\x1b(c@#F00)"; // red
+@@ -2968,8 +2977,17 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
+ 		runData.repeat_place_timer = 0;
+ 		infostream << "Place button pressed while looking at ground" << std::endl;
+ 
+-		// Placing animation (always shown for feedback)
+-		camera->setDigging(1);
++		// FreeCraft: Hand bewegt sich nur, wenn der Rechtsklick etwas tut
++		bool fc_anim = false;
++		{
++			const auto &fc_def = selected_item.getDefinition(itemdef_manager);
++			bool fc_rc = nodedef_manager->get(map.getNode(nodepos)).rightclickable ||
++				(meta && !meta->getString("formspec").empty());
++			if (fc_rc && !isKeyDown(KeyType::SNEAK))
++				fc_anim = true;
++			else if (!selected_item.empty() && fc_def.node_placement_prediction.empty())
++				fc_anim = true;
++		}
+ 
+ 		soundmaker->m_player_rightpunch_sound = SoundSpec();
+ 
+@@ -2981,6 +2999,9 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
+ 		bool placed = nodePlacement(def, selected_item, nodepos, neighborpos,
+ 			pointed, meta);
+ 
++		if (placed || fc_anim)
++			camera->setDigging(1);
++
+ 		if (placed && client->modsLoaded())
+ 			client->getScript()->on_placenode(pointed, def);
+ 	}
+diff --git a/src/client/game_formspec.cpp b/src/client/game_formspec.cpp
+index b10e8da..ca704c1 100644
+--- a/src/client/game_formspec.cpp
++++ b/src/client/game_formspec.cpp
+@@ -353,124 +353,92 @@ void GameFormSpec::showPlayerInventory(const std::string *fs_override)
+ 	fs_src.release(); // owned by GUIFormSpecMenu
+ }
+ 
+-#define SIZE_TAG "size[14.25,7.275,true]" // Fixed size (ignored in touchscreen mode)
++#define SIZE_TAG "size[14.25,7.275,true]" // legacy size (death screen)
+ 
+-void GameFormSpec::showPauseMenu()
++// FreeCraft: Pausenmenü im Stil des Hauptmenüs
++static std::string fc_mode_word(bool creative)
+ {
+-	std::string control_text;
+-
+-	if (g_touchcontrols) {
+-		control_text = strgettext("Controls:\n"
+-			"No menu open:\n"
+-			"- slide finger: look around\n"
+-			"- tap: place/punch/use (default)\n"
+-			"- long tap: dig/use (default)\n"
+-			"Menu/inventory open:\n"
+-			"- double tap (outside):\n"
+-			" --> close\n"
+-			"- touch stack, touch slot:\n"
+-			" --> move stack\n"
+-			"- touch&drag, tap 2nd finger\n"
+-			" --> place single item to slot\n"
+-			);
+-	}
++	static const char *langs[] = {"de","fr","es","it","pt","nl","pl","ru","tr","ja","zh"};
++	static const char *cr[] = {"Kreativ","Créatif","Creativo","Creativa","Criativo","Creatief","Kreatywny","Творчество","Yaratıcı","クリエイティブ","创造"};
++	static const char *su[] = {"Überleben","Survie","Supervivencia","Sopravvivenza","Sobrevivência","Overleven","Przetrwanie","Выживание","Hayatta kalma","サバイバル","生存"};
++	std::string lang = g_settings->get("language");
++	if (lang.empty())
++		lang = gettext_get_lang_code();
++	lang = lang.substr(0, 2);
++	for (size_t i = 0; i < 11; i++) {
++		if (lang == langs[i])
++			return creative ? cr[i] : su[i];
++	}
++	return creative ? "Creative" : "Survival";
++}
+ 
++void GameFormSpec::showPauseMenu()
++{
+ 	auto simple_singleplayer_mode = m_client->m_simple_singleplayer_mode;
++	const std::string &address = m_client->getAddressName();
+ 
+-	const float button_height = 0.8f;
+-	const float spacing = 0.38f;
+-	float ypos = simple_singleplayer_mode ? 1.05f : 0.325f;
+-	std::ostringstream os;
+-
+-	os << "formspec_version[2]" << SIZE_TAG;
+-
+-	if (simple_singleplayer_mode) {
+-		os << "style_type[label;halign=center;valign=center]";
+-		os << "label[5.375,0;3.5," << ypos << ";" << strgettext("Game paused") << "]";
+-	}
+-
+-	os << "container[5.375,0]";
+-	os << "button_exit[0," << ypos << ";3.5," << button_height << ";btn_continue;"
+-		// TRANSLATORS: Pause menu button, try to keep the translation short
+-		<< strgettext("Continue") << "]";
+-
+-	if (!simple_singleplayer_mode) {
+-		os << "button[0," << (ypos += button_height + spacing) << ";3.5," << button_height << ";btn_change_password;"
+-			// TRANSLATORS: Pause menu button, try to keep the translation short
+-			<< strgettext("Change Password") << "]";
+-	}
+-
+-	os << "button[0," << (ypos += button_height + spacing) << ";3.5," << button_height << ";btn_settings;"
+-		// TRANSLATORS: Try to keep the translation short
+-		<< strgettext("Settings") << "]";
+-
+-#ifndef __ANDROID__
++	const float W = 9.0f, BW = 7.0f, BX = 1.0f, BH = 0.95f, GAP = 0.25f;
++	int nbuttons = 4;
++	if (!simple_singleplayer_mode)
++		nbuttons++;
+ #if USE_SOUND
+-	os << "button[0," << (ypos += button_height + spacing) << ";3.5," << button_height << ";btn_sound;"
+-		// TRANSLATORS: Pause menu button, try to keep the translation short
+-		<< strgettext("Sound Volume") << "]";
++	nbuttons++;
+ #endif
+-#endif
+-
+-	os << "button_exit[0," << (ypos += button_height + spacing) << ";3.5," << button_height << ";btn_exit_menu;"
+-		// TRANSLATORS: Pause menu button, try to keep the translation short
+-		<< strgettext("Exit to Menu") << "]";
++	const float top = 2.55f;
++	const float H = top + nbuttons * (BH + GAP) + 0.55f;
+ 
+-	os << "button_exit[0," << (ypos += button_height + spacing) << ";3.5," << button_height << ";btn_exit_os;"
+-		// TRANSLATORS: Pause menu button, try to keep the translation short (OS = Operating System)
+-		<< strgettext("Exit to OS") << "]";
+-
+-	os << "container_end[]";
+-	if (!control_text.empty()) {
+-		os << "textarea[9.25,0.8;4.625,6.1;;" << control_text << ";]";
+-	}
+-	os << "textarea[0.375,0.8;4.625,6.075;;" << PROJECT_NAME_C " " VERSION_STRING "\n"
+-		<< "\n" <<  strgettext("Game info:") << "\n";
+-
+-	const std::string &address = m_client->getAddressName();
+-	// TRANSLATORS: Game mode (server or singleplayer)
+-	os << strgettext("- Mode: ");
+-	if (!simple_singleplayer_mode) {
+-		if (address.empty())
+-			os << strgettext("Hosting server");
+-		else
+-			os << strgettext("Remote server");
+-	} else {
+-		os << strgettext("Singleplayer");
+-	}
+-	os << "\n";
+-	if (simple_singleplayer_mode || address.empty()) {
+-		static const std::string on = strgettext("On");
+-		static const std::string off = strgettext("Off");
+-		// Note: Status of enable_damage and creative_mode settings is intentionally
+-		// NOT shown here because the game might roll its own damage system and/or do
+-		// a per-player Creative Mode, in which case writing it here would mislead.
+-		bool damage = g_settings->getBool("enable_damage");
+-		const std::string &announced = g_settings->getBool("server_announce") ? on : off;
+-		if (!simple_singleplayer_mode) {
+-			if (damage) {
+-				const std::string &pvp = g_settings->getBool("enable_pvp") ? on : off;
+-				// TRANSLATORS: PvP = Player versus Player
+-				os << strgettext("- PvP: ") << pvp << "\n";
+-			}
+-			os << strgettext("- Public: ") << announced << "\n";
+-			std::string server_name = g_settings->get("server_name");
+-			str_formspec_escape(server_name);
+-			if (announced == on && !server_name.empty())
+-				os << strgettext("- Server Name: ") << server_name;
+-
+-		}
+-	}
+-	os << ";]";
++	std::ostringstream os;
++	os << "formspec_version[4]size[" << W << "," << H << "]"
++		<< "bgcolor[#00000000;true;#05081299]"
++		<< "background9[0,0;" << W << "," << H << ";fc_panel.png;false;14]"
++		<< "style_type[button,button_exit;bgimg=fc_btn.png;bgimg_hovered=fc_btn_h.png;"
++			"bgimg_pressed=fc_btn_p.png;bgimg_middle=8;border=false;textcolor=#ffffff;font_size=*1.1]"
++		<< "style[btn_continue;bgimg=fc_btn_go.png;bgimg_hovered=fc_btn_go_h.png;bgimg_pressed=fc_btn_p.png]"
++		<< "style_type[label;halign=center;valign=center;font=bold;font_size=*1.7;textcolor=#ffffff]"
++		<< "label[0,0.35;" << W << ",0.9;" << PROJECT_NAME_C << " 1.0]";
++
++	// Info-Zeile: Modus, Spielmodus
++	std::string info = simple_singleplayer_mode ? strgettext("Singleplayer")
++		: (address.empty() ? strgettext("Hosting server") : strgettext("Remote server"));
++	info += ", ";
++	info += fc_mode_word(m_client->checkPrivilege("fly"));
++	if (simple_singleplayer_mode)
++		info = strgettext("Game paused") + "  ·  " + info;
++	str_formspec_escape(info);
++	os << "style_type[label;font=normal;font_size=*1.0;textcolor=#9fe8ff]"
++		<< "label[0,1.25;" << W << ",0.5;" << info << "]";
++	if (!simple_singleplayer_mode && address.empty()) {
++		std::string l2 = strgettext("- Public: ");
++		l2 += g_settings->getBool("server_announce") ? strgettext("On") : strgettext("Off");
++		std::string server_name = g_settings->get("server_name");
++		if (!server_name.empty())
++			l2 += "  ·  " + server_name;
++		str_formspec_escape(l2);
++		os << "style_type[label;textcolor=#c8d4e8;font_size=*0.9]"
++			<< "label[0,1.75;" << W << ",0.5;" << l2 << "]";
++	}
++
++	float ypos = top;
++	auto button = [&](const char *type, const char *name, const std::string &text) {
++		os << type << "[" << BX << "," << ypos << ";" << BW << "," << BH << ";" << name << ";" << text << "]";
++		ypos += BH + GAP;
++	};
++	button("button_exit", "btn_continue", strgettext("Continue"));
++	button("button", "btn_settings", strgettext("Settings"));
++#if USE_SOUND
++	button("button", "btn_sound", strgettext("Sound Volume"));
++#endif
++	if (!simple_singleplayer_mode)
++		button("button", "btn_change_password", strgettext("Change Password"));
++	button("button_exit", "btn_exit_menu", strgettext("Exit to Menu"));
++	button("button_exit", "btn_exit_os", strgettext("Exit to OS"));
+ 
+-	/* Create menu */
+-	/* Note: FormspecFormSource and LocalFormspecHandler  *
+-	 * are deleted by guiFormSpecMenu                     */
+ 	FormspecFormSource *fs_src = new FormspecFormSource(os.str());
+ 	HardcodedPauseFormspecHandler *txt_dst = new HardcodedPauseFormspecHandler();
+ 
++	// Kein Formspec-Prepend: eigenes Aussehen
+ 	GUIFormSpecMenu::create(m_formspec, m_client, m_rendering_engine->get_gui_env(),
+-			fs_src, txt_dst, m_client->getFormspecPrepend(),
++			fs_src, txt_dst, "",
+ 			m_client->getSoundManager());
+ 	m_formspec->setFocus("btn_continue");
+ 	// game will be paused in next step, if in singleplayer (see Game::m_is_paused)
+diff --git a/src/client/gameui.cpp b/src/client/gameui.cpp
+index 29408ff..8f1c209 100644
+--- a/src/client/gameui.cpp
++++ b/src/client/gameui.cpp
+@@ -95,7 +95,7 @@ void GameUI::update(const RunStats &stats, Client *client, MapDrawControl *draw_
+ 
+ 		std::ostringstream os(std::ios_base::binary);
+ 		os << std::fixed
+-			<< PROJECT_NAME_C " " << g_version_hash
++			<< PROJECT_NAME_C " 1.0"
+ 			<< " | FPS: " << fps
+ 			<< std::setprecision(m_drawtime_avg < 10 ? 1 : 0)
+ 			<< " | drawtime: " << m_drawtime_avg << "ms"
+diff --git a/src/defaultsettings.cpp b/src/defaultsettings.cpp
+index d0e0562..00eb7b1 100644
+--- a/src/defaultsettings.cpp
++++ b/src/defaultsettings.cpp
+@@ -175,7 +175,7 @@ void set_default_settings()
+ #endif
+ 	settings->setDefault("keymap_toggle_debug", "SYSTEM_SCANCODE_62"); // KEY_F5
+ 	settings->setDefault("keymap_toggle_profiler", "SYSTEM_SCANCODE_63"); // KEY_F6
+-	settings->setDefault("keymap_camera_mode", "SYSTEM_SCANCODE_6"); // KEY_KEY_C
++	settings->setDefault("keymap_camera_mode", "SYSTEM_SCANCODE_66"); // KEY_F9
+ 	settings->setDefault("keymap_camera_yaw_left", "GAMEPAD_AXIS_MINUS_2"); // Right Joystick
+ 	settings->setDefault("keymap_camera_yaw_right", "GAMEPAD_AXIS_PLUS_2"); // Right Joystick
+ 	settings->setDefault("keymap_camera_pitch_up", "GAMEPAD_AXIS_MINUS_3"); // Right Joystick

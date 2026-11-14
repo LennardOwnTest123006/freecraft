@@ -11,6 +11,7 @@ local function lan_ip() return core.settings:get("fc_lan_ip") or "" end
 local function theme()
 	local g = pkgmgr.find_by_gameid(GAME)
 	if g then mm_game_theme.set_game(g) end
+	core.set_topleft_text("")
 end
 
 local function dlg(name, fs, handler)
@@ -331,6 +332,15 @@ local function public_servers()
 			out[#out+1] = s
 		end
 	end
+	-- Empfohlen: meiste Spieler zuerst (volle Server ans Ende)
+	table.sort(out, function(a, b)
+		local ca, cb = tonumber(a.clients) or 0, tonumber(b.clients) or 0
+		local fa = ca >= (tonumber(a.clients_max) or 1e9)
+		local fb = cb >= (tonumber(b.clients_max) or 1e9)
+		if fa ~= fb then return fb end
+		if ca ~= cb then return ca > cb end
+		return tostring(a.name or "") < tostring(b.name or "")
+	end)
 	return out
 end
 
@@ -350,7 +360,7 @@ local function multi_fs()
 		else
 			local rows = {}
 			for _, s in ipairs(list) do
-				rows[#rows+1] = esc(("%s  (%d/%d %s)"):format(s.name or s.address, tonumber(s.clients) or 0, tonumber(s.clients_max) or 0, T("players")))
+				rows[#rows+1] = esc(("%s%s  (%d/%d %s)"):format(#rows == 0 and "★ " or "", s.name or s.address, tonumber(s.clients) or 0, tonumber(s.clients_max) or 0, T("players")))
 			end
 			if mstate.sel > #list then mstate.sel = 1 end
 			f[#f+1] = ("textlist[0.6,2.7;8.8,4.2;srv;%s;%d;false]"):format(table.concat(rows, ","), mstate.sel)
