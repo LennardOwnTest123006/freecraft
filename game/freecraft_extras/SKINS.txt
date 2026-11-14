@@ -1,0 +1,10 @@
+FreeCraft - Skins
+=================
+Skin-Auswahl im Spiel: Befehl /skin (Skin-Editor und Liste aller Skins).
+Mitgelieferte Beispiel-Skins (von uns selbst gemacht): Scout, Ranger, Miner, Knight, Mage, Builder.
+
+Eigenen Skin hinzufuegen (z. B. dein eigener Minecraft-Skin als PNG, 64x64 oder 64x32):
+1. PNG nach  games\freecraft\mods\MISC\freecraft_extras\textures\  kopieren
+2. Dateiname: freecraft_skin_MEINNAME.png   (Skins mit duenneren Armen: freecraft_skin_MEINNAME_slim.png)
+3. Spiel neu starten, /skin eingeben und den Skin auswaehlen.
+Bitte nur eigene Skins oder Skins verwenden, die du nutzen darfst.
