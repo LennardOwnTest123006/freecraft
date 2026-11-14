@@ -316,8 +316,10 @@ local function skins_formspec(name)
 			if selected then
 				fs[#fs+1] = ("style[pick%d;bgimg=fc_btn_go.png;bgimg_hovered=fc_btn_go_h.png;bgimg_pressed=fc_btn_p.png]"):format(i)
 			end
-			fs[#fs+1] = ("button[%f,%f;2.7,0.55;pick%d;%s]"):format(x + 0.1, y + 2.55, i,
+			fs[#fs+1] = ("button[%f,%f;1.9,0.55;pick%d;%s]"):format(x + 0.1, y + 2.55, i,
 				esc(selected and S("Selected") or S("Select")))
+			fs[#fs+1] = ("tooltip[custom%d;%s]button[%f,%f;0.75,0.55;custom%d;\u{270E}]"):format(i,
+				esc(S("Customize this skin")), x + 2.05, y + 2.55, i)
 		end
 	end
 	fs[#fs+1] = ("button[0.6,9.1;1.6,0.8;prev;<]style_type[label;font_size=*1.1]label[2.6,9.5;%s]button[3.5,9.1;1.6,0.8;next;>]")
@@ -349,6 +351,22 @@ core.register_on_player_receive_fields(function(player, formname, fields)
 		return
 	else
 		for i = 1, SKIN_PER_PAGE do
+			if fields["custom" .. i] then
+				local skin = list[(page - 1) * SKIN_PER_PAGE + i]
+				if skin then
+					local ps = mcl_skins.player_skins[player]
+					ps.simple_skins_id = nil
+					ps.base_skin = skin.texture
+					ps.base = nil
+					ps.slim_arms = skin.slim_arms
+					for _, it in ipairs({"headwear", "hair", "eye", "mouth", "top", "bottom", "footwear", "cape"}) do ps[it] = nil end
+					player:get_meta():set_string("mcl_skins:skin_id", "")
+					mcl_skins.save(player)
+					mcl_skins.update_player_skin(player)
+					core.registered_chatcommands["skin"].func(name, "")
+					return
+				end
+			end
 			if fields["pick" .. i] then
 				local skin = list[(page - 1) * SKIN_PER_PAGE + i]
 				if skin then

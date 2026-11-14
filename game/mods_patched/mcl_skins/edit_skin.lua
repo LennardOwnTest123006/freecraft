@@ -76,10 +76,15 @@ local function get_player_skins(player)
 
 		mcl_skins.player_skins[player] = skin
 	else
-		if math.random() > 0.5 then
-			skin = table.copy(mcl_skins.template1)
-		else
-			skin = table.copy(mcl_skins.template2)
+		-- FreeCraft: Standard ist der Mann (erster Skin der Liste)
+		skin = table.copy(mcl_skins.template1)
+		local first
+		for k in pairs(mcl_skins.simple_skins) do
+			if type(k) == "number" and k >= 0 and (not first or k < first) then first = k end
+		end
+		if first then
+			skin.simple_skins_id = mcl_skins.simple_skins[first].texture
+			skin.slim_arms = mcl_skins.simple_skins[first].slim_arms
 		end
 		mcl_skins.player_skins[player] = skin
 	end
@@ -191,7 +196,7 @@ function mcl_skins.compile_skin(skin)
 		end
 	end
 	table.sort(ranks)
-	local output = ""
+	local output = skin.base_skin or "" -- FreeCraft: jeder fertige Skin kann als Basis angepasst werden
 	for i, rank in ipairs(ranks) do
 		if #output > 0 then output = output .. "^" end
 		output = output .. layers[rank]
