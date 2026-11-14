@@ -12,10 +12,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"unsafe"
-	"runtime"
 )
 
 //go:embed payload.zip
@@ -91,7 +91,7 @@ func unzip(data []byte, dst, strip string) error {
 }
 
 func engine(dst string) error {
-	resp, err := http.Get("https://api.github.com/repos/luanti-org/luanti/releases/latest")
+	resp, err := http.Get("https://api.github.com/repos/luanti-org/luanti/releases/tags/5.18.0")
 	if err != nil {
 		return err
 	}
@@ -132,9 +132,9 @@ func engine(dst string) error {
 }
 
 type memStatus struct {
-	Length, MemoryLoad                                                uint32
+	Length, MemoryLoad                                                             uint32
 	TotalPhys, AvailPhys, TotalPageFile, AvailPageFile, TotalVirtual, AvailVirtual uint64
-	AvailExtendedVirtual                                              uint64
+	AvailExtendedVirtual                                                           uint64
 }
 
 func ramGB() int {
@@ -159,7 +159,7 @@ func tune(dst string) {
 	default:
 		extra = "\n# Auto: starker PC\nviewing_range = 180\nshadow_map_texture_size = 2048\nshadow_map_max_distance = 140\nfsaa = 4\nenable_auto_exposure = true\n"
 	}
-	f, err := os.OpenFile(filepath.Join(dst, "luanti.conf"), os.O_APPEND|os.O_WRONLY, 0o644)
+	f, err := os.OpenFile(filepath.Join(dst, "minetest.conf"), os.O_APPEND|os.O_WRONLY, 0o644)
 	if err == nil {
 		f.WriteString(extra)
 		f.Close()
@@ -186,13 +186,18 @@ func main() {
 		return
 	}
 	fmt.Println(t["lnk"])
-	exe := filepath.Join(dst, "bin", "luanti.exe")
-	ps := fmt.Sprintf(`$s=(New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath('Desktop')+'\FreeCraft.lnk');$s.TargetPath='%s';$s.Arguments='--gameid freecraft';$s.WorkingDirectory='%s';$s.Save()`, exe, filepath.Join(dst, "bin"))
+	exe := filepath.Join(dst, "FreeCraft.bat")
+	ico := filepath.Join(dst, "freecraft.ico")
+	mk := func(name, target, args, wd string, style int) string {
+		return fmt.Sprintf(`$s=(New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath('Desktop')+'\%s.lnk');$s.TargetPath='%s';$s.Arguments='%s';$s.WorkingDirectory='%s';$s.IconLocation='%s';$s.WindowStyle=%d;$s.Save()`, name, target, args, wd, ico, style)
+	}
 	os.MkdirAll(filepath.Join(dst, "worlds"), 0o755)
-	ps2 := fmt.Sprintf(`$s=(New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath('Desktop')+'\FreeCraft Worlds.lnk');$s.TargetPath='%s';$s.Save()`, filepath.Join(dst, "worlds"))
-	exec.Command("powershell", "-NoProfile", "-Command", ps+";"+ps2).Run()
+	ps := mk("FreeCraft", exe, "", dst, 7) + ";" + mk("FreeCraft Server", filepath.Join(dst, "FreeCraft Server.bat"), "", dst, 1) + ";" + mk("FreeCraft Worlds", filepath.Join(dst, "worlds"), "", dst, 1)
+	exec.Command("powershell", "-NoProfile", "-Command", ps).Run()
 	fmt.Println(t["done"])
 	fmt.Println(t["start"])
 	bufio.NewReader(os.Stdin).ReadString('\n')
-	exec.Command(exe, "--gameid", "freecraft").Start()
+	c := exec.Command("cmd", "/c", exe)
+	c.Dir = dst
+	c.Start()
 }

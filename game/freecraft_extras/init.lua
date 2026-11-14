@@ -45,6 +45,40 @@ core.register_on_joinplayer(function(player)
 		.. "  /" .. alias_for("skins", player:get_player_name()) .. "  /" .. alias_for("home", player:get_player_name()))
 end)
 
+
+-- Server-Info: LAN- und Internet-Adresse zum Weitergeben an Freunde
+local http = core.request_http_api and core.request_http_api()
+local public_ip
+if http then
+	http.fetch({url = "https://api.ipify.org", timeout = 5}, function(res)
+		if res.succeeded and res.data and res.data:match("^[%d%.]+$") then public_ip = res.data end
+	end)
+end
+
+local function server_info()
+	local port = core.settings:get("port") or "30000"
+	local lan = core.settings:get("fc_lan_ip")
+	local lines = {}
+	lines[#lines+1] = core.colorize("#55FFFF", "FreeCraft server is running")
+	if lan and lan ~= "" then lines[#lines+1] = "  Same WiFi / LAN:  " .. lan .. "  Port " .. port end
+	if public_ip then lines[#lines+1] = "  Internet:  " .. public_ip .. "  Port " .. port .. "  (needs UDP port forwarding)"
+	else lines[#lines+1] = "  Internet:  see /ip in a moment (needs UDP port forwarding)" end
+	return table.concat(lines, "\n")
+end
+
+core.register_chatcommand("ip", {
+	description = "Show the address friends use to join",
+	func = function() return true, server_info() end,
+})
+
+core.register_on_joinplayer(function(player)
+	local n = player:get_player_name()
+	if core.is_singleplayer() then return end
+	if n == core.settings:get("name") then
+		core.after(2, function() core.chat_send_player(n, server_info()) end)
+	end
+end)
+
 core.register_chatcommand("freecraft", {
 	description = S("Info about FreeCraft"),
 	func = function()

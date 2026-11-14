@@ -5,6 +5,20 @@ No account. No paywall. Your worlds are saved locally on your PC.
 
 🌐 Website & one-click download: **https://freecraft-download.pages.dev**
 
+## Multiplayer & servers
+
+**Play with friends (easiest way):** start FreeCraft → **Host server** → pick a name → **Start server**. The in-game chat then shows the addresses to share:
+- same WiFi / LAN: `192.168.x.x` + port (default 30000)
+- over the Internet: your public IP + port (your router must forward **UDP 30000** to your PC; or use a free VPN like Radmin VPN / ZeroTier and share the VPN address instead). Type `/ip` any time to show them again.
+
+Friends start FreeCraft → **Multiplayer**, type IP and port, **Join**.
+
+**Private vs. public:** in *Host server* choose *Private (friends only)* – nobody can find it without IP and port – or *Public*, which announces the server to the public Luanti server list.
+
+**Dedicated server (`FreeCraft Server.bat`):** it is in the install folder (`%LOCALAPPDATA%\FreeCraft`) and there is a *FreeCraft Server* shortcut on the desktop. It asks for the port and private/public, prints the LAN and Internet address and runs without a window of the game.
+
+**24/7 server:** run `FreeCraft Server.bat` on an always-on machine (spare PC, Raspberry Pi with the Linux build of Luanti, or a cheap VPS), forward UDP 30000, and keep it running as a Windows service/scheduled task at start-up (e.g. `schtasks /create /tn FreeCraftServer /tr "\"%LOCALAPPDATA%\FreeCraft\FreeCraft Server.bat\"" /sc onstart`). Back up `worlds\Server`.
+
 ## Download
 
 1. Open the website above and click **Download FreeCraft for Windows**, or join the files from [`dl/`](dl/) yourself (see below).
