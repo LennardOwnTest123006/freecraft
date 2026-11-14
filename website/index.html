@@ -48,6 +48,15 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 nav{display:flex;align-items:center;min-width:0}.lang{max-width:190px}
 @media(max-width:760px){nav a{display:none}.nav{height:54px}.brand{font-size:17px}.lang{max-width:62vw;font-size:13px}}
 @media(max-width:640px){.hero{min-height:520px}.btn{width:100%;justify-content:center}.sub,.lead{font-size:16px}}
+/* Immer passend: nie seitlich scrollen (Handy, iPhone, iPad, Tablet, Desktop) */
+html,body{max-width:100%;overflow-x:hidden}
+*,*:before,*:after{box-sizing:border-box}
+img,video,svg{max-width:100%;height:auto}
+p,li,td,th,h1,h2,h3,a,span,b,.dl-meta{overflow-wrap:anywhere;word-break:break-word}
+table{width:100%;table-layout:fixed}
+.wrap{width:100%;max-width:1100px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+h1{font-size:clamp(28px,6.5vw,56px)}h2{font-size:clamp(22px,4.5vw,34px)}
+.credits a{display:inline;word-break:break-all}
 </style>
 </head>
 <body>
