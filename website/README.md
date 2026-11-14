@@ -1,43 +1,12 @@
-# FreeCraft – Download-Website (freecraft-download.pages.dev)
+# FreeCraft – Download-Website
 
-**Die Setup-Teile liegen auf GitHub (github.com/LennardOwnTest123006/freecraft, Ordner `dl/`)** – so bleibt diese Seite winzig (~1 MB). Die Seite lädt sie von dort (`downloadBase` in `config.js`).
+Statische Seite (HTML/CSS/JS, kein Build nötig), responsiv, 12 Sprachen.
 
-(Älterer Hinweis:) Die Setup-Datei liegt in Teilen (je 20 MB) im Ordner `dl/`, weil Cloudflare Pages nur 25 MiB pro Datei erlaubt. Der Button lädt die Teile im Browser, setzt sie zusammen und speichert `FreeCraft-Setup.exe`.
+- **Sprache:** automatisch nach System-/Browsersprache, Fallback Englisch; oben rechts jederzeit umschaltbar ("Automatic" = Systemsprache).
+- **Bilder:** echte FreeCraft-Screenshots (`img/shots/`), je Sprache für Hauptmenü, /skins und Inventar.
+- **3D-Skins:** eigener WebGL-Viewer (`js/skin3d.js`), Skins in `img/skins/`.
+- **Download:** `config.js` (Repo + `downloadBase`). Die Seite setzt `FreeCraft-Setup.exe` aus den Teilen in `dl/` zusammen und prüft die Größe.
+- **Icon:** `favicon.ico`, `img/icons/` (aktuelles blaues FreeCraft-Logo).
 
-**Neue Version veröffentlichen:**
-1. `FreeCraft Setup.exe` in Teile schneiden: `split -b 20m -d -a 2 "FreeCraft Setup.exe" dl/FreeCraft-Setup.part`
-2. `dl/manifest.json` anpassen (`version`, `size` in Bytes, `parts`-Liste)
-3. Ordner neu bei Cloudflare Pages hochladen.
-
----
-(Ältere Anleitung mit GitHub-Release, optional:)
-
-# FreeCraft – Download-Website (Cloudflare Pages)
-
-Statische Seite (HTML, CSS, JavaScript – keine Build-Schritte, keine Abhängigkeiten), responsiv für Handy und Desktop.
-Sprachen: 12 (Standard Englisch, automatische Erkennung nach Browser/Gerät, überall umschaltbar). Credits: JumpIn Games.
-
-## 1. Die Setup-ZIP hosten (wichtig!)
-Cloudflare Pages erlaubt nur **25 MiB pro Datei** – die `FreeCraft-Setup.zip` (~82 MB) passt dort NICHT hinein.
-Kostenlose Lösung: **GitHub Release**
-1. GitHub-Repository anlegen (z. B. `freecraft`), dort den Quellcode (GPLv3 verlangt Quellcode-Zugang) hochladen.
-2. „Releases“ → „Draft a new release“ → Tag `v1.0` → `FreeCraft-Setup.exe` (direkt, empfohlen) und/oder `FreeCraft-Setup.zip` anhängen → veröffentlichen.
-3. In `config.js` eintragen: `githubRepo: "DEIN-NAME/freecraft"`.
-Die Seite zeigt dann automatisch immer die **neueste** Version (Versionsnummer, Datum, Größe) und verlinkt direkt den Download. Der Button lädt die **FreeCraft-Setup.exe** der neuesten Release (Dateiname exakt `FreeCraft-Setup.exe`; gibt es keine .exe, nimmt er die ZIP).
-Neue Version? Einfach ein neues Release veröffentlichen – die Website muss nicht neu deployt werden.
-(Alternative ohne GitHub: in `config.js` `fallbackUrl` auf einen direkten ZIP-Link setzen, z. B. Cloudflare R2.)
-
-## 2. Deploy auf Cloudflare Pages (kostenlos)
-**Variante A – im Browser:** dash.cloudflare.com → Workers & Pages → Create → Pages → „Upload assets“ → Projektname `freecraft` → diesen Ordner (entpackt) hochladen → Deploy.
-**Variante B – Kommandozeile:**
-```
-npx wrangler login
-npx wrangler pages deploy . --project-name freecraft
-```
-Die Seite ist dann unter `https://freecraft.pages.dev` erreichbar (eigene Domain später unter „Custom domains“).
-
-## Dateien
-- `index.html`, `style.css`, `app.js` – Seite
-- `config.js` – hier GitHub-Repo / Fallback-Link / Kontakt eintragen
-- `img/` – Bilder (selbst gerenderte Vorschauen)
-- `_headers` – Sicherheits- und Cache-Header für Cloudflare
+Hosting: Ordnerinhalt auf Cloudflare Pages / GitHub Pages hochladen. Nach Updates Strg+F5 (Cache).
+Quellcode frei (Open Source). Kontakt: siehe `config.js`.

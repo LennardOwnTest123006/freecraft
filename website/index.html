@@ -2,122 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>FreeCraft – free block adventure for Windows</title>
-<meta name="description" content="FreeCraft by JumpIn Games: free, open 3D sandbox game for Windows. Download the latest version.">
-<link rel="icon" href="img/favicon.png?v=9">
-<style>:root{--bg:#14171c;--bg2:#1c2027;--card:#232830;--line:#323945;--txt:#e9edf2;--mut:#a3adba;--green:#5fd068;--green2:#3fa84a;--gold:#ffd24a;--r:14px}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
-a{color:var(--green)}img{max-width:100%;display:block}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-header{position:sticky;top:0;z-index:10;background:rgba(20,23,28,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.nav{display:flex;align-items:center;justify-content:space-between;height:58px;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--txt);text-decoration:none;letter-spacing:.3px}
-.brand img{width:34px;height:34px;image-rendering:pixelated}
-nav a{color:var(--mut);text-decoration:none;margin-left:18px;font-size:15px}nav a:hover{color:var(--txt)}
-.hero{position:relative;min-height:560px;display:flex;align-items:center;overflow:hidden}
-.hero:before{content:"";position:absolute;inset:0;background:url(img/hero.webp) center/cover;filter:brightness(.55) saturate(1.1)}
-.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,23,28,.1),var(--bg))}
-.hero .wrap{position:relative;z-index:1;padding-top:50px;padding-bottom:70px}
-.hero .wrap{width:100%}.wordmark{font-size:clamp(46px,9vw,92px);font-weight:900;letter-spacing:2px;line-height:1;margin-bottom:14px;color:#eef1f4;text-shadow:3px 3px 0 #3a3f48,6px 6px 0 #14171c,0 10px 28px rgba(0,0,0,.5)}
-.hero h1{font-size:clamp(28px,4.4vw,46px);line-height:1.15;margin:8px 0 12px;max-width:720px;text-shadow:0 3px 14px rgba(0,0,0,.6)}
-.hero p.lead{font-size:18px;color:#dfe5ec;max-width:640px;margin:0 0 24px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
-.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:12px;background:linear-gradient(var(--green),var(--green2));color:#0c1a0e;font-weight:800;font-size:18px;text-decoration:none;border:0;cursor:pointer;box-shadow:0 8px 24px rgba(63,168,74,.35);transition:transform .15s}
-.btn:hover{transform:translateY(-2px)}.btn.alt{background:var(--card);color:var(--txt);box-shadow:none;border:1px solid var(--line);font-size:16px;padding:13px 20px}
-.dl-meta{margin-top:14px;color:#cfd7e0;font-size:14px;display:flex;gap:16px;flex-wrap:wrap}
-.dl-meta b{color:var(--gold)}
-.badge{display:inline-block;background:rgba(255,210,74,.14);color:var(--gold);border:1px solid rgba(255,210,74,.4);border-radius:99px;padding:3px 12px;font-size:13px;font-weight:700;margin-bottom:10px}
-section{padding:64px 0}section.alt{background:var(--bg2);border-block:1px solid var(--line)}
-h2{font-size:clamp(24px,3.4vw,34px);margin:0 0 8px}.sub{color:var(--mut);margin:0 0 28px}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
-.card h3{margin:6px 0 6px;font-size:18px}.card p{margin:0;color:var(--mut);font-size:15px}.ic{font-size:28px}
-.shots{display:grid;align-items:start;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.shots figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.shots figcaption{padding:12px 16px;color:var(--mut);font-size:14px}
-ol.steps{counter-reset:s;list-style:none;padding:0;display:grid;gap:14px}
-ol.steps li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 16px 64px;position:relative}
-ol.steps li:before{content:counter(s);position:absolute;left:16px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:9px;background:var(--green);color:#0c1a0e;font-weight:800;display:grid;place-items:center}
-.note{background:rgba(255,210,74,.08);border:1px solid rgba(255,210,74,.35);border-radius:var(--r);padding:14px 18px;color:#f1e3b0;font-size:15px;margin-top:18px}
-table{width:100%;border-collapse:collapse}td,th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:15px}th{color:var(--mut);font-weight:600;width:34%}
-.credits p{color:var(--mut);margin:.4em 0}.credits b{color:var(--txt)}
-footer{border-top:1px solid var(--line);padding:28px 0;color:var(--mut);font-size:14px}
-footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.lang{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:14px}
-nav{display:flex;align-items:center;min-width:0}.lang{max-width:190px}
-@media(max-width:760px){nav a{display:none}.nav{height:54px}.brand{font-size:17px}.lang{max-width:62vw;font-size:13px}}
-@media(max-width:640px){.hero{min-height:520px}.btn{width:100%;justify-content:center}.sub,.lead{font-size:16px}}
-
-/* Immer passend: nie seitlich scrollen (Handy, iPhone, iPad, Tablet, Desktop) */
-html{max-width:100%;overflow-x:hidden}body{max-width:100%;overflow-x:clip}
-*,*:before,*:after{box-sizing:border-box}
-img,video,svg{max-width:100%;height:auto}
-p,li,td,th,h1,h2,h3,a,span,b,.dl-meta{overflow-wrap:anywhere;word-break:break-word}
-table{width:100%;table-layout:fixed}
-.wrap{width:100%;max-width:1100px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
-h1{font-size:clamp(28px,6.5vw,56px)}h2{font-size:clamp(22px,4.5vw,34px)}
-.credits a{display:inline;word-break:break-all}
-
-/* Kopfleiste immer sichtbar, Titel nie umbrechen */
-header{position:-webkit-sticky;position:sticky;top:0;z-index:50}
-.brand,.brand *{white-space:nowrap;overflow-wrap:normal;word-break:normal;flex-shrink:0}
-.brand{font-size:clamp(18px,5.4vw,22px)}
-.nav{flex-wrap:nowrap}
-nav{flex:1 1 auto;justify-content:flex-end;min-width:0}
-.lang{min-width:0;flex:0 1 auto}
-@media(max-width:760px){.lang{max-width:calc(100vw - 190px)}}
-@media(max-width:380px){.lang{max-width:calc(100vw - 170px)}.brand img{width:28px;height:28px}}
-</style>
+<meta name="description" content="FreeCraft by JumpIn Games: free, open-source 3D sandbox game for Windows. Download the latest version.">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" href="favicon.ico?v=11" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/icons/fc-32.png?v=11">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icons/fc-192.png?v=11">
+<link rel="apple-touch-icon" href="img/icons/fc-180.png?v=11">
+<link rel="manifest" href="site.webmanifest?v=11">
+<meta property="og:title" content="FreeCraft – free block adventure for Windows">
+<meta property="og:description" content="Build, survive, explore – free and open source.">
+<meta property="og:image" content="img/hero.webp">
+<link rel="preload" as="image" href="img/hero.webp?v=11">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
-<header><div class="wrap nav">
-  <a class="brand" href="#top"><img src="img/favicon.png?v=9" alt=""> FreeCraft</a>
-  <nav>
-    <a class="hide" href="#features" data-i="nav_features"></a>
-    <a class="hide" href="#shots" data-i="nav_shots"></a>
-    <a href="#install" data-i="nav_install"></a>
-    <a class="hide" href="#credits" data-i="nav_credits"></a>
+<header class="top"><div class="wrap nav">
+  <a class="brand" href="#top" aria-label="FreeCraft"><img src="img/icons/fc-64.png?v=11" width="34" height="34" alt=""><span>FreeCraft</span></a>
+  <nav aria-label="Main">
+    <a class="hide-m" href="#features" data-i="nav_features"></a>
+    <a class="hide-m" href="#shots" data-i="nav_shots"></a>
+    <a class="hide-m" href="#skin3d" data-i="nav_3d"></a>
+    <a class="hide-m" href="#install" data-i="nav_install"></a>
+    <a class="hide-m" href="#credits" data-i="nav_credits"></a>
     <select id="lang" class="lang" aria-label="Language"></select>
   </nav>
 </div></header>
 
 <main id="top">
-<div class="hero"><div class="wrap">
-  <div class="wordmark">FreeCraft</div>
-  <div><span class="badge" data-i="badge"></span></div>
-  <h1 data-i="h1"></h1>
-  <p class="lead" data-i="lead"></p>
-  <a id="dl" class="btn" href="#install" rel="noopener"><span>⬇</span> <span data-i="dl"></span></a>
-  <div class="dl-meta" id="meta"></div>
-</div></div>
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <h1 class="wordmark"><img src="img/wordmark.png?v=11" width="940" height="167" alt="FreeCraft"></h1>
+      <span class="badge" data-i="badge"></span>
+      <p class="tagline" data-i="h1"></p>
+      <p class="lead" data-i="lead"></p>
+      <div class="cta-row">
+        <a id="dl" class="btn" href="#install" rel="noopener"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span data-i="dl"></span></a>
+        <a class="btn ghost" href="#shots"><span data-i="nav_shots"></span></a>
+      </div>
+      <div class="dl-meta" id="meta"></div>
+      <ul class="stats">
+        <li data-i="st1"></li><li data-i="st2"></li><li data-i="f6t"></li><li>Windows 10 / 11</li>
+      </ul>
+    </div>
+    <div class="hero-shot" aria-hidden="true">
+      <div class="win"><div class="win-bar"><i></i><i></i><i></i></div><img data-shot="menu" src="img/shots/menu_en.webp?v=11" alt="" width="1280" height="720" fetchpriority="high"></div>
+    </div>
+  </div>
+</section>
 
 <section id="features"><div class="wrap">
   <h2 data-i="f_title"></h2><p class="sub" data-i="f_sub"></p>
   <div class="grid">
-    <div class="card"><div class="ic">🌅</div><h3 data-i="f1t"></h3><p data-i="f1"></p></div>
-    <div class="card"><div class="ic">⛏️</div><h3 data-i="f2t"></h3><p data-i="f2"></p></div>
-    <div class="card"><div class="ic">🐖</div><h3 data-i="f3t"></h3><p data-i="f3"></p></div>
-    <div class="card"><div class="ic">🧍</div><h3 data-i="f4t"></h3><p data-i="f4"></p></div>
-    <div class="card"><div class="ic">🖥️</div><h3 data-i="f5t"></h3><p data-i="f5"></p></div>
-    <div class="card"><div class="ic">🌍</div><h3 data-i="f6t"></h3><p data-i="f6"></p></div>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M4 22h24v6H4zM16 4l3 6 6 1-4.5 4.2 1.2 6.3L16 18.4 10.3 21.5l1.2-6.3L7 11l6-1z" fill="currentColor"/></svg><h3 data-i="f1t"></h3><p data-i="f1"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M6 26L20 12l-3-3 3-3 6 6-3 3-3-3L9 29zM18 6l8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg><h3 data-i="f2t"></h3><p data-i="f2"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M5 12h16v10H5zM21 9h6v8h-6zM8 22v5M18 22v5" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M23 12h2v2h-2z" fill="currentColor"/></svg><h3 data-i="f3t"></h3><p data-i="f3"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M11 3h10v9H11zM9 14h14v10H9zM9 14H5v9h4M23 14h4v9h-4zM11 24v5h4v-5M17 24v5h4v-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg><h3 data-i="f4t"></h3><p data-i="f4"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M4 6h24v16H4zM12 28h8M16 22v6" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg><h3 data-i="f5t"></h3><p data-i="f5"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M4 16h24M16 4c-5 5-5 19 0 24M16 4c5 5 5 19 0 24" fill="none" stroke="currentColor" stroke-width="2.4"/></svg><h3 data-i="f6t"></h3><p data-i="f6"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M16 3l11 6v14l-11 6-11-6V9zM16 3v26M5 9l11 6 11-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg><h3 data-i="f7t"></h3><p data-i="f7"></p></article>
+    <article class="card"><svg class="ic" viewBox="0 0 32 32"><path d="M3 10h26v14H3z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M8 15h3v3H8zM13 15h3v3h-3zM18 15h3v3h-3zM9 20h14" fill="currentColor"/></svg><h3 data-i="f8t"></h3><p data-i="f8"></p></article>
   </div>
 </div></section>
 
 <section id="shots" class="alt"><div class="wrap">
   <h2 data-i="s_title"></h2><p class="sub" data-i="s_sub"></p>
-  <div class="shots">
-    <figure><img loading="lazy" data-img="menu" src="img/menu_en.webp?v=9" alt=""><figcaption data-i="s1"></figcaption></figure>
-    <figure><img loading="lazy" data-img="skins" src="img/skins_en.webp?v=9" alt=""><figcaption data-i="s2"></figcaption></figure>
-    <figure><img loading="lazy" data-img="mobs" src="img/mobs_en.webp?v=9" alt=""><figcaption data-i="s3"></figcaption></figure>
+  <div class="gallery">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <figure class="stage"><button class="stage-btn" id="stageBtn" type="button" aria-label="Zoom"><img id="stageImg" src="img/shots/menu_en.webp?v=11" alt="" width="1280" height="720"></button><figcaption id="stageCap"></figcaption></figure>
   </div>
 </div></section>
 
-<section id="install"><div class="wrap">
+<section id="skin3d"><div class="wrap skin-grid">
+  <div class="skin-info">
+    <h2 data-i="v_title"></h2><p class="sub" data-i="v_sub"></p>
+    <div class="picker" id="picker" role="group"></div>
+  </div>
+  <div class="viewer"><canvas id="skinCanvas" aria-label="3D"></canvas><span class="hint" data-i="v_hint"></span></div>
+</div></section>
+
+<section id="install" class="alt"><div class="wrap">
   <h2 data-i="i_title"></h2><p class="sub" data-i="i_sub"></p>
   <ol class="steps"><li data-i="i1"></li><li data-i="i2"></li><li data-i="i3"></li></ol>
   <div class="note" data-i="i_note"></div>
-  <h2 style="margin-top:44px" data-i="r_title"></h2>
+  <h2 class="mt" data-i="r_title"></h2>
   <div class="card"><table>
     <tr><th data-i="r1"></th><td data-i="r1v"></td></tr>
     <tr><th data-i="r2"></th><td data-i="r2v"></td></tr>
@@ -125,9 +96,10 @@ nav{flex:1 1 auto;justify-content:flex-end;min-width:0}
     <tr><th data-i="r4"></th><td data-i="r4v"></td></tr>
     <tr><th data-i="r5"></th><td data-i="r5v"></td></tr>
   </table></div>
+  <p class="center"><a class="btn" id="dl2" href="#install"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span data-i="dl"></span></a></p>
 </div></section>
 
-<section id="credits" class="alt"><div class="wrap credits">
+<section id="credits"><div class="wrap credits">
   <h2 data-i="c_title"></h2>
   <p><b data-i="c_owner"></b> JumpIn Games</p>
   <p data-i="c_own"></p>
@@ -140,6 +112,12 @@ nav{flex:1 1 auto;justify-content:flex-end;min-width:0}
 </main>
 
 <footer><div class="wrap"><span>© 2026 JumpIn Games</span><span data-i="foot"></span></div></footer>
-<script src="config.js?v=9"></script>
-<script src="app.js?v=9"></script>
+
+<div class="lightbox" id="lb" hidden><button class="lb-x" id="lbX" type="button" aria-label="Close">×</button><img id="lbImg" alt=""></div>
+<noscript><p style="padding:20px;text-align:center">FreeCraft – JavaScript is needed for the download button. / JavaScript wird für den Download-Button benötigt.</p></noscript>
+
+<script src="config.js?v=11"></script>
+<script src="js/i18n.js?v=11"></script>
+<script src="js/skin3d.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
 </body></html>
