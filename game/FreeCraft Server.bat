@@ -171,6 +171,7 @@ if not exist "worlds\Server\world.mt" (
   >> "worlds\Server\world.mt" echo auth_backend = sqlite3
   >> "worlds\Server\world.mt" echo mod_storage_backend = sqlite3
 )
+powershell -NoProfile -Command "$w='worlds\Server\world.mt'; $c=Get-Content $w; if(Test-Path mods){ Get-ChildItem mods -Directory | ForEach-Object { if(-not ($c -match ('^load_mod_'+$_.Name+' '))){ Add-Content $w ('load_mod_'+$_.Name+' = true') } } }"
 copy /y minetest.conf server.conf >nul
 >> server.conf echo port = %PORT%
 >> server.conf echo ipv6_server = false

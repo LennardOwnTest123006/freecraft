@@ -57,3 +57,5 @@ Back at your last death position.=Son ölüm konumuna döndün.
 Suggestions for /@1:=/@1 için öneriler:
 VoxeLibre (formerly MineClone2) – used as scaffolding and helper for some parts (GPLv3). https@://github.com/VoxeLibre/VoxeLibre=VoxeLibre (eski adı MineClone2) – bazı bölümler için iskelet ve yardımcı olarak kullanılır (GPLv3). https://github.com/VoxeLibre/VoxeLibre
 FreeCraft by JumpIn Games – uses VoxeLibre (GPLv3) as scaffolding for some parts.=JumpIn Games'ten FreeCraft – bazı bölümler için VoxeLibre'yi (GPLv3) iskelet olarak kullanır.
+Build Skin=Skin oluştur
+Drag a preview with the mouse to rotate it.=Önizlemeyi fareyle sürükleyerek döndür.

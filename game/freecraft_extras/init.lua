@@ -292,26 +292,38 @@ local function skins_formspec(name)
 	local page = math.min(skin_page[name] or 1, pages)
 	local player = core.get_player_by_name(name)
 	local cur = mcl_skins.player_skins[player] and mcl_skins.player_skins[player].simple_skins_id
-	local fs = {"formspec_version[4]size[13,9.6]",
-		"box[0,0;13,0.9;#1b1b1fcc]",
-		"label[0.4,0.45;", core.formspec_escape(core.colorize("#FFDD55", S("Choose your skin"))), "]"}
+	local esc = core.formspec_escape
+	local W, H = 13.4, 10.6
+	local fs = {
+		"formspec_version[6]size[", W, ",", H, "]padding[0.05,0.05]bgcolor[#00000000;false]",
+		"background9[0,0;", W, ",", H, ";fc_panel.png;false;14]",
+		"style_type[button;bgimg=fc_btn.png;bgimg_hovered=fc_btn_h.png;bgimg_pressed=fc_btn_p.png;bgimg_middle=8;border=false;textcolor=#ffffff]",
+		"style_type[button_exit;bgimg=fc_btn.png;bgimg_hovered=fc_btn_h.png;bgimg_pressed=fc_btn_p.png;bgimg_middle=8;border=false;textcolor=#ffffff]",
+		"style_type[label;font_size=*1.5;font=bold;textcolor=#7fe9ff]label[0.6,0.8;", esc(S("Choose your skin")), "]",
+		"style_type[label;font_size=*1;font=normal;textcolor=#cfe8ff]",
+		"label[0.6,1.35;", esc(S("Drag a preview with the mouse to rotate it.")), "]",
+	}
 	for i = 1, SKIN_PER_PAGE do
 		local skin = list[(page - 1) * SKIN_PER_PAGE + i]
 		if skin then
 			local col, row = (i - 1) % 4, math.floor((i - 1) / 4)
-			local x, y = 0.4 + col * 3.1, 1.1 + row * 3.9
+			local x, y = 0.6 + col * 3.1, 1.8 + row * 3.4
 			local mesh = skin.slim_arms and "mcl_armor_character_female.b3d" or "mcl_armor_character.b3d"
-			fs[#fs+1] = ("box[%f,%f;2.9,3.7;%s]"):format(x, y, skin.texture == cur and "#55AA55aa" or "#00000055")
-			fs[#fs+1] = ("model[%f,%f;2.9,3.0;sk%d;%s;%s,blank.png,blank.png;0,200;false;true;0,0]")
-				:format(x, y, i, mesh, skin.texture)
-			fs[#fs+1] = ("button[%f,%f;2.9,0.6;pick%d;%s]"):format(x, y + 3.05, i,
-				core.formspec_escape(skin.texture == cur and S("Selected") or S("Select")))
+			local selected = skin.texture == cur
+			fs[#fs+1] = ("box[%f,%f;2.9,3.2;%s]"):format(x, y, selected and "#1c8f9a88" or "#070a16cc")
+			fs[#fs+1] = ("model[%f,%f;2.9,2.5;sk%d;%s;%s,blank.png,blank.png;0,200;false;true;0,0]")
+				:format(x, y + 0.05, i, mesh, skin.texture)
+			if selected then
+				fs[#fs+1] = ("style[pick%d;bgimg=fc_btn_go.png;bgimg_hovered=fc_btn_go_h.png;bgimg_pressed=fc_btn_p.png]"):format(i)
+			end
+			fs[#fs+1] = ("button[%f,%f;2.7,0.55;pick%d;%s]"):format(x + 0.1, y + 2.55, i,
+				esc(selected and S("Selected") or S("Select")))
 		end
 	end
-	fs[#fs+1] = ("button[0.4,8.7;2,0.7;prev;<]label[2.7,9.05;%s]button[4,8.7;2,0.7;next;>]")
-		:format(core.formspec_escape(page .. " / " .. pages))
-	fs[#fs+1] = ("button[6.6,8.7;2.9,0.7;upload;%s]button[9.6,8.7;1.5,0.7;editor;%s]button_exit[11.2,8.7;1.5,0.7;close;%s]")
-		:format(core.formspec_escape(S("Upload your skin")), core.formspec_escape(S("Editor")), core.formspec_escape(S("Close")))
+	fs[#fs+1] = ("button[0.6,9.1;1.6,0.8;prev;<]style_type[label;font_size=*1.1]label[2.6,9.5;%s]button[3.5,9.1;1.6,0.8;next;>]")
+		:format(esc(page .. " / " .. pages))
+	fs[#fs+1] = ("button[5.5,9.1;3.4,0.8;upload;%s]button[9.0,9.1;2.4,0.8;editor;%s]button_exit[11.5,9.1;1.5,0.8;close;%s]")
+		:format(esc(S("Upload your skin")), esc(S("Build Skin")), esc(S("Close")))
 	return table.concat(fs)
 end
 
@@ -360,9 +372,20 @@ local SKIN_DIR = core.get_worldpath() .. "/skins"
 local user_skins = {}   -- {filename=, index=}
 local next_index = 100
 
+local function png_height(path)
+	local f = io.open(path, "rb")
+	if not f then return 32 end
+	local d = f:read(24); f:close()
+	if not d or #d < 24 then return 32 end
+	return d:byte(21) * 16777216 + d:byte(22) * 65536 + d:byte(23) * 256 + d:byte(24)
+end
+
 local function register_user_skin(filename)
 	local idx = next_index; next_index = next_index + 1
-	mcl_skins.register_simple_skin({ index = idx, texture = filename, slim_arms = filename:find("_slim") ~= nil })
+	-- Moderne 64x64-Skins werden fuer das Charaktermodell auf 64x32 zugeschnitten
+	local tex = filename
+	if png_height(SKIN_DIR .. "/" .. filename) == 64 then tex = "[combine:64x32:0,0=" .. filename end
+	mcl_skins.register_simple_skin({ index = idx, texture = tex, slim_arms = filename:find("_slim") ~= nil })
 	user_skins[#user_skins+1] = { filename = filename, index = idx }
 	return idx
 end

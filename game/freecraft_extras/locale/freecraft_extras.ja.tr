@@ -57,3 +57,5 @@ Back at your last death position.=最後に死亡した場所に戻りました�
 Suggestions for /@1:=/@1 の候補:
 VoxeLibre (formerly MineClone2) – used as scaffolding and helper for some parts (GPLv3). https@://github.com/VoxeLibre/VoxeLibre=VoxeLibre（旧 MineClone2）– 一部の機能の土台・補助として使用 (GPLv3)。 https://github.com/VoxeLibre/VoxeLibre
 FreeCraft by JumpIn Games – uses VoxeLibre (GPLv3) as scaffolding for some parts.=JumpIn Games の FreeCraft – 一部の機能で VoxeLibre (GPLv3) を土台として使用。
+Build Skin=スキンを作る
+Drag a preview with the mouse to rotate it.=プレビューをマウスでドラッグすると回転します。
