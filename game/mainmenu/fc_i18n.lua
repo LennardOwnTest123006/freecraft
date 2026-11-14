@@ -42,6 +42,26 @@ add("zh",{"单人游戏","多人游戏","创建服务器","设置","退出","返
  "创造模式","启用伤害","玩家名称","密码","密码（可选）","服务器 IP 地址","端口","加入","启动服务器","可见性","私人（仅好友）","公开（显示在列表）","服务器名称",
  "请向房主询问 IP 地址和端口。","同一 WiFi 的朋友使用局域网地址，其他朋友使用互联网地址（路由器：转发 UDP 端口，或使用 Radmin VPN 等免费 VPN）。","局域网地址（同一 WiFi）","互联网地址","还没有世界","删除这个世界？","是，删除","取消","请输入玩家名称。","请输入服务器 IP 地址。","请输入有效端口（1-65535）。","请先选择一个世界。","创建服务器","加入服务器","单人游戏","未知"})
 
+-- additional keys (en/de/fr/es translated, others fall back to English)
+local X = {
+ en={settings_title="Settings",allsettings="All settings",credits="Credits",graphics="Graphics & shaders",g_low="Fast",g_mid="Balanced",g_high="Shaders",g_ultra="Ultra",
+  g_note="Shaders: soft shadows, bloom, waving leaves and water. Pick Fast on slow PCs.",mods="Mods & texture packs",mods_dl="Download mods & texture packs",mods_txp="Browse texture packs",
+  mods_dir="Mods folder",txp_dir="Textures folder",txp_pick="Active texture pack",none="None",direct="Direct connect",servers="FreeCraft servers",refresh="Refresh",
+  no_servers="No public FreeCraft servers online yet. Start one with Host a server → Public.",loading="Loading server list…",players="players",worldmods="Mods of this world",
+  credits_text="FreeCraft 1.0\nby JumpIn Games\n\nFreeCraft is based on VoxeLibre (GPLv3) and its many contributors.\nThank you to everyone who made it possible.\n\nLicense texts are in the install folder (NOTICE.md).",
+  starting="Starting server…"},
+ de={settings_title="Einstellungen",allsettings="Alle Einstellungen",credits="Credits",graphics="Grafik & Shader",g_low="Schnell",g_mid="Ausgewogen",g_high="Shader",g_ultra="Ultra",
+  g_note="Shader: weiche Schatten, Bloom, wehende Blätter und Wasser. Auf langsamen PCs „Schnell“ wählen.",mods="Mods & Texturpakete",mods_dl="Mods & Texturpakete herunterladen",mods_txp="Texturpakete suchen",
+  mods_dir="Mods-Ordner",txp_dir="Texturen-Ordner",txp_pick="Aktives Texturpaket",none="Keins",direct="Direkt verbinden",servers="FreeCraft-Server",refresh="Aktualisieren",
+  no_servers="Noch keine öffentlichen FreeCraft-Server online. Starte einen mit Server hosten → Öffentlich.",loading="Serverliste wird geladen…",players="Spieler",worldmods="Mods dieser Welt",
+  credits_text="FreeCraft 1.0\nvon JumpIn Games\n\nFreeCraft basiert auf VoxeLibre (GPLv3) und seinen vielen Mitwirkenden.\nDanke an alle, die das möglich gemacht haben.\n\nLizenztexte liegen im Installationsordner (NOTICE.md).",
+  starting="Server startet…"},
+ fr={settings_title="Paramètres",allsettings="Tous les paramètres",credits="Crédits",graphics="Graphismes & shaders",g_low="Rapide",g_mid="Équilibré",g_high="Shaders",g_ultra="Ultra",
+  mods="Mods & packs de textures",direct="Connexion directe",servers="Serveurs FreeCraft",refresh="Actualiser",players="joueurs"},
+ es={settings_title="Ajustes",allsettings="Todos los ajustes",credits="Créditos",graphics="Gráficos y shaders",g_low="Rápido",g_mid="Equilibrado",g_high="Shaders",g_ultra="Ultra",
+  mods="Mods y paquetes de texturas",direct="Conexión directa",servers="Servidores FreeCraft",refresh="Actualizar",players="jugadores"},
+}
+
 local function lang()
 	local l = ""
 	if core.get_language then l = core.get_language() or "" end
@@ -50,6 +70,8 @@ local function lang()
 	return l
 end
 function fc_T(k)
-	local t = L[lang()] or L.en
-	return t[k] or L.en[k] or k
+	local lg = lang()
+	local t = L[lg] or L.en
+	local x = X[lg]
+	return (x and x[k]) or t[k] or X.en[k] or L.en[k] or k
 end
