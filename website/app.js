@@ -32,11 +32,15 @@ function render(){
  else{meta.textContent=T("err")}
 }
 let man=null;
-const BASE=()=>C.downloadBase||"dl/";
+let baseIdx=0;const BASES=()=>[].concat(C.downloadBase||["dl/"]);
+const BASE=()=>BASES()[baseIdx]||BASES()[0];
 const MSG={en:["Downloading","Done – check your Downloads folder","Download failed – please try again"],de:["Lade herunter","Fertig – schau in deinen Downloads-Ordner","Download fehlgeschlagen – bitte nochmal versuchen"],fr:["Téléchargement","Terminé – regarde dans tes Téléchargements","Échec – réessaie"],es:["Descargando","Listo – mira tu carpeta de Descargas","Error – inténtalo de nuevo"],it:["Download in corso","Fatto – controlla la cartella Download","Download non riuscito – riprova"],pt:["Baixando","Pronto – veja sua pasta Downloads","Falha no download – tente novamente"],nl:["Downloaden","Klaar – kijk in je map Downloads","Download mislukt – probeer opnieuw"],pl:["Pobieranie","Gotowe – sprawdź folder Pobrane","Pobieranie nie powiodło się – spróbuj ponownie"],ru:["Загрузка","Готово – проверьте папку «Загрузки»","Ошибка загрузки – попробуйте ещё раз"],tr:["İndiriliyor","Bitti – İndirilenler klasörüne bak","İndirme başarısız – tekrar dene"],ja:["ダウンロード中","完了 – ダウンロードフォルダを確認してください","失敗しました – もう一度お試しください"],zh:["正在下载","完成 – 请查看下载文件夹","下载失败 – 请重试"]};
 const M=i=>(MSG[lang]||MSG.en)[i];
 async function getMan(){
- try{const r=await fetch(BASE()+"manifest.json?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();if(j&&j.parts&&j.parts.length)man=j}catch(e){}
+ for(baseIdx=0;baseIdx<BASES().length;baseIdx++){
+ try{const r=await fetch(BASE()+"manifest.json?"+Date.now(),{cache:"no-store"});if(!r.ok)continue;const j=await r.json();if(j&&j.parts&&j.parts.length){man=j;return}}catch(e){}
+ }
+ baseIdx=0;
 }
 async function bigDownload(ev){
  if(!man)return;ev.preventDefault();

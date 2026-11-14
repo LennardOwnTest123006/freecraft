@@ -1,6 +1,8 @@
 # FreeCraft – Download-Website (freecraft-download.pages.dev)
 
-**Der Download-Button funktioniert ohne GitHub:** Die Setup-Datei liegt in Teilen (je 20 MB) im Ordner `dl/`, weil Cloudflare Pages nur 25 MiB pro Datei erlaubt. Der Button lädt die Teile im Browser, setzt sie zusammen und speichert `FreeCraft-Setup.exe`.
+**Die Setup-Teile liegen auf GitHub (github.com/LennardOwnTest123006/freecraft, Ordner `dl/`)** – so bleibt diese Seite winzig (~1 MB). Die Seite lädt sie von dort (`downloadBase` in `config.js`).
+
+(Älterer Hinweis:) Die Setup-Datei liegt in Teilen (je 20 MB) im Ordner `dl/`, weil Cloudflare Pages nur 25 MiB pro Datei erlaubt. Der Button lädt die Teile im Browser, setzt sie zusammen und speichert `FreeCraft-Setup.exe`.
 
 **Neue Version veröffentlichen:**
 1. `FreeCraft Setup.exe` in Teile schneiden: `split -b 20m -d -a 2 "FreeCraft Setup.exe" dl/FreeCraft-Setup.part`
