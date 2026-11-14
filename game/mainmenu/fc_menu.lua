@@ -149,7 +149,7 @@ local function settings_fs()
 	f[#f+1] = "style_type[textarea;font_size=*0.9]textarea[0.6,3.55;7.8,0.95;;;" .. esc(T("g_note")) .. "]style_type[textarea;font_size=*1]"
 	f[#f+1] = "button[0.6,4.6;7.8,1.1;all;" .. esc(T("allsettings")) .. "]"
 	f[#f+1] = "button[0.6,6.0;7.8,1.1;credits;" .. esc(T("credits")) .. "]"
-	f[#f+1] = "button[0.6,7.4;7.8,1.1;lang;Language / Sprache]"
+	f[#f+1] = "button[0.6,7.4;7.8,1.1;lang;" .. core.formspec_escape(fc_langlabel()) .. "]"
 	return table.concat(f)
 end
 

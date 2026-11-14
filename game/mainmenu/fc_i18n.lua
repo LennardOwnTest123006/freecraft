@@ -80,6 +80,13 @@ local function lang()
 	l = tostring(l):lower():gsub("[_%-].*$","")
 	return l
 end
+local LANGWORD = {de="Sprache",fr="Langue",es="Idioma",it="Lingua",pt="Idioma",nl="Taal",pl="Język",ru="Язык",tr="Dil",ja="言語",zh="语言"}
+function fc_langlabel()
+	local w = LANGWORD[lang()]
+	if w then return "Language / " .. w end
+	return "Language"
+end
+
 function fc_T(k)
 	local lg = lang()
 	local t = L[lg] or L.en
