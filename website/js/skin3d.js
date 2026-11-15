@@ -72,7 +72,7 @@ function setSkin(img){
 }
 function loadSkin(n,cb){
   if(imgs[n]){cb(imgs[n]);return}
-  var im=new Image();im.onload=function(){imgs[n]=im;cb(im)};im.src="img/skins/skin"+n+".png?v=14";
+  var im=new Image();im.onload=function(){imgs[n]=im;cb(im)};im.src="img/skins/skin"+n+".png?v=15";
 }
 
 /* ---------- Zeichnen & Eingabe ---------- */

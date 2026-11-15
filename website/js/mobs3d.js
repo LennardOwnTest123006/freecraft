@@ -7,7 +7,7 @@ var box=view.querySelector(".mobimgs");
 var N=16,NAMES=["cow","pig","sheep","chicken","horse","wolf","villager","iron_golem","zombie","spider"];
 var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 var cache={},imgs=[],cur=-1,ang=0,vel=0,drag=false,lx=0,lt=0,idle=9,visible=true,last=performance.now(),shown=[-1,-1];
-function src(m,k){return "img/mobs/"+m+"_"+(k<10?"0":"")+k+".webp?v=14"}
+function src(m,k){return "img/mobs/"+m+"_"+(k<10?"0":"")+k+".webp?v=15"}
 function load(m){
   if(cache[m])return cache[m];
   var a=[];for(var k=0;k<N;k++){var im=new Image();im.decoding="async";im.alt="";im.width=480;im.height=450;im.draggable=false;im.src=src(m,k);im.style.opacity=0;a.push(im)}
@@ -43,6 +43,6 @@ view.addEventListener("pointerdown",down);view.addEventListener("pointermove",mo
 view.addEventListener("pointerup",up);view.addEventListener("pointercancel",up);
 view.addEventListener("keydown",function(e){if(e.key==="ArrowLeft"){vel+=3;idle=0}if(e.key==="ArrowRight"){vel-=3;idle=0}});
 if("IntersectionObserver" in window){new IntersectionObserver(function(es){visible=es[0].isIntersecting;if(visible&&cur<0)show(0)},{rootMargin:"200px"}).observe(view)}
-window.FCMobs={names:NAMES,set:show,thumb:function(i){return "img/mobs/"+NAMES[i]+"_00.webp?v=14"}};
+window.FCMobs={names:NAMES,set:show,thumb:function(i){return "img/mobs/"+NAMES[i]+"_00.webp?v=15"}};
 requestAnimationFrame(frame);
 })();
