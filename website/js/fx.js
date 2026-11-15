@@ -105,7 +105,7 @@ function fx(){
     else if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission!=="function"){
       addEventListener("deviceorientation",function(e){if(e.gamma==null)return;ry(Math.max(-8,Math.min(8,e.gamma/5)));rx(Math.max(-6,Math.min(6,((e.beta||0)-50)/-8)))},{passive:true});
     }
-    g.to(panel,{y:-60,opacity:.2,scale:.96,ease:"none",scrollTrigger:{trigger:hero,start:"60% top",end:"bottom top",scrub:true}});
+    g.fromTo(panel,{y:0,opacity:1,scale:1},{y:-60,opacity:.2,scale:.96,ease:"none",immediateRender:false,scrollTrigger:{trigger:hero,start:"60% top",end:"bottom top",scrub:true}});
   }
 
   /* Überschriften kippen herein */
@@ -126,9 +126,9 @@ function fx(){
     });
   }
   /* Screenshot-Bühne und Viewer legen sich aus der Tiefe an */
-  g.fromTo("#stage",{rotationX:16,y:50,transformPerspective:1200,transformOrigin:"50% 100%",scale:.92},{rotationX:0,y:0,scale:1,ease:"none",scrollTrigger:{trigger:"#stage",start:"top 100%",end:"top 40%",scrub:true}});
+  g.fromTo("#stage",{rotationX:16,y:50,transformPerspective:1200,transformOrigin:"50% 100%",scale:.92},{rotationX:0,y:0,scale:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#stage",start:"top 100%",end:"top 40%",scrub:true}});
   g.utils.toArray(".viewer").forEach(function(v,i){
-    g.fromTo(v,{rotationY:i?-14:14,x:i?-40:40,opacity:.2,transformPerspective:1000},{rotationY:0,x:0,opacity:1,ease:"none",scrollTrigger:{trigger:v,start:"top 105%",end:"top 55%",scrub:true}});
+    g.fromTo(v,{rotationY:i?-14:14,x:i?-40:40,opacity:.2,transformPerspective:1000},{rotationY:0,x:0,opacity:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:v,start:"top 105%",end:"top 55%",scrub:true}});
   });
   /* Sprach-Reihen driften beim Scrollen */
   g.utils.toArray(".langs .row").forEach(function(r,i){

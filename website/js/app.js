@@ -41,7 +41,7 @@ sel.addEventListener("change",e=>{
 /* ---------- Galerie ---------- */
 const TABS=[["menu","g_menu",true],["skins","g_skins",true],["inv","g_inv",true],["animals","g_animals",false],["world","g_world",false]];
 let tab="menu";
-const shotSrc=(id,loc)=>"img/shots/"+id+(loc?"_"+lang:"")+".webp?v=15";
+const shotSrc=(id,loc)=>"img/shots/"+id+(loc?"_"+lang:"")+".webp?v=16";
 const stageBtn=document.getElementById("stageBtn"),stageImg=document.getElementById("stageImg");
 function renderTabs(){
   const box=document.getElementById("tabs");box.textContent="";
@@ -55,7 +55,7 @@ function renderGallery(animate){
   renderTabs();
   const t=TABS.find(x=>x[0]===tab);
   const apply=()=>{
-    stageImg.onerror=()=>{stageImg.onerror=null;stageImg.src="img/shots/"+tab+(t[2]?"_en":"")+".webp?v=15"};
+    stageImg.onerror=()=>{stageImg.onerror=null;stageImg.src="img/shots/"+tab+(t[2]?"_en":"")+".webp?v=16"};
     stageImg.onload=()=>stageBtn.classList.remove("swap");
     stageImg.src=shotSrc(tab,t[2]);stageImg.alt=T(t[1]);
   };
@@ -193,7 +193,7 @@ function motion(){
     .from("#heroPanel .badge,#heroPanel h1,#heroPanel .lead,#heroPanel .cta-row,#heroPanel .meta",{y:18,opacity:0,duration:.6,stagger:.08},.85);
   if(window.ScrollTrigger){
     g.to(".hero-bg",{yPercent:10,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-    g.from("#stage",{scale:.94,ease:"none",scrollTrigger:{trigger:"#stage",start:"top 95%",end:"top 45%",scrub:true}});
+    
   }
   const bg=document.querySelector(".hero-bg");
   if(bg&&matchMedia("(hover:hover)").matches){
