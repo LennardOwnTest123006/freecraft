@@ -41,3 +41,7 @@ Im Auswahlfeld gibt es zusätzlich „Automatic". Die Sprachnamen stehen immer a
 * Tastatur bedienbar, sichtbarer Fokus, Skip-Link
 * `prefers-reduced-motion` wird beachtet (keine Auto-Drehung, keine Einblend-Animationen)
 * Bilder mit Alt-Texten, Kontrast nach WCAG AA
+
+## Effekte (v14)
+- `js/fx.js` + `css/fx.css`: Intro (JumpIn-Games-Logo, 3D-Würfel), schwebende 3D-Voxel-Würfel, Scroll-Fortschritt, 3D-Karten, Scroll-Würfel unten rechts. Mit „Weniger Bewegung“ im System wird alles abgeschaltet.
+- Größen skalieren automatisch (Handy bis 4K) über `clamp()`.

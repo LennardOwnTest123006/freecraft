@@ -1,0 +1,59 @@
+/* FX: Intro, 3D-Voxel-Würfel, Scroll-Effekte, fluide Größen */
+html{font-size:clamp(15px,.32vw + 14px,21px);overflow-x:clip}
+body{overflow-x:clip}
+:root{--wrap:clamp(1100px,72vw,1640px)}
+.wrap{width:min(100% - 32px,var(--wrap))}
+.bar{padding-left:max(14px,env(safe-area-inset-left),calc((100vw - var(--wrap))/2));padding-right:max(14px,env(safe-area-inset-right),calc((100vw - var(--wrap))/2));gap:12px}
+.brand{flex:0 0 auto}.brand span{white-space:nowrap}
+.langpick{min-width:0;flex:0 1 230px;margin-left:auto}
+.bar nav+.langpick{margin-left:0}
+.langpick select{width:100%;max-width:none!important;text-overflow:ellipsis}
+.fcol{min-width:0}.foot a,.foot p{overflow-wrap:anywhere}
+h1{font-size:clamp(2rem,3.2vw + 1rem,4.4rem)}
+h2{font-size:clamp(1.7rem,2.2vw + 1rem,3.1rem)}
+img,video,canvas{max-width:100%}
+@media (max-width:400px){.brand span{font-size:1.05rem}.brand img{width:30px;height:30px}.bar{gap:8px}}
+@media (min-width:1700px){.hero-panel{max-width:min(46%,820px)}}
+
+.foot .made{display:flex;align-items:center;gap:14px}
+.foot .made img{border-radius:14px;width:64px;height:64px;flex:none}
+
+/* Scroll-Fortschritt */
+#prog{position:fixed;left:0;top:0;height:3px;width:100%;z-index:130;background:linear-gradient(90deg,var(--cyan),var(--sun));transform:scaleX(0);transform-origin:0 50%;pointer-events:none}
+
+/* Würfel (CSS-3D) */
+.cube{position:absolute;width:var(--s);height:var(--s);transform-style:preserve-3d}
+.cube i{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;backface-visibility:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.cube .ft{transform:translateZ(calc(var(--s)/2))}
+.cube .bk{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}
+.cube .rt{transform:rotateY(90deg) translateZ(calc(var(--s)/2));filter:brightness(.82)}
+.cube .lf{transform:rotateY(-90deg) translateZ(calc(var(--s)/2));filter:brightness(.7)}
+.cube .tp{transform:rotateX(90deg) translateZ(calc(var(--s)/2));filter:brightness(1.12)}
+.cube .bt{transform:rotateX(-90deg) translateZ(calc(var(--s)/2));filter:brightness(.55)}
+.fx-cubes{position:absolute;inset:0;perspective:900px;pointer-events:none;z-index:1;overflow:hidden}
+.hero-panel{z-index:2}.scrollhint{z-index:3}
+.final .fx-cubes{z-index:0}.final .wrap{position:relative;z-index:1}
+
+/* Intro */
+#intro{position:fixed;inset:0;z-index:1000;background:radial-gradient(120% 90% at 50% 40%,#17305e 0%,#0b1730 55%,#060d1d 100%);display:grid;place-items:center;perspective:900px;overflow:hidden}
+#intro .ilogo{position:absolute;width:min(46vw,230px);height:auto;border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+#intro .iscene{position:absolute;width:0;height:0;transform-style:preserve-3d}
+#intro .ibar{position:absolute;left:50%;bottom:calc(14vh + env(safe-area-inset-bottom));width:min(56vw,260px);height:6px;margin-left:calc(min(56vw,260px)/-2);background:rgba(255,255,255,.14);overflow:hidden}
+#intro .ibar b{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--sun));transform:scaleX(0);transform-origin:0 50%}
+#intro .iskip{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));background:rgba(255,255,255,.1);color:#cfe0f7;border:1px solid rgba(255,255,255,.22);padding:8px 14px;font:600 .85rem var(--body);cursor:pointer}
+#intro .iskip:hover{background:rgba(255,255,255,.2);color:#fff}
+body.introing{overflow:hidden}
+
+/* Scroll-Würfel unten rechts */
+#vxTop{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));width:60px;height:60px;z-index:120;background:none;border:0;padding:0;cursor:pointer;perspective:300px;opacity:0;pointer-events:none;transition:opacity .3s}
+#vxTop.on{opacity:1;pointer-events:auto}
+#vxTop .cube{left:14px;top:14px}
+#vxTop:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+/* Tilt-Karten */
+.bento>*,.req,.steps li,.viewer{transform-style:preserve-3d}
+@media (prefers-reduced-motion:reduce){#intro,.fx-cubes{display:none!important}#prog{display:none}}
+.foot .made{grid-column:1/-1}
+.hero h1{font-size:clamp(1.9rem,2.4vw + .9rem,3.3rem)}
+.hero-panel{width:min(clamp(560px,46vw,860px),100% - 28px);margin-bottom:clamp(24px,6vh,64px);padding:clamp(20px,2.4vw,40px) clamp(20px,2.6vw,44px)}
+@media (max-height:760px) and (min-width:900px){.hero-panel{padding-block:18px}.wordmark{width:min(100%,360px)}.lead{margin:10px 0 16px}}
