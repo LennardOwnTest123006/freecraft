@@ -2,7 +2,6 @@ package main
 
 import (
 	"archive/zip"
-	"bufio"
 	"bytes"
 	_ "embed"
 	"encoding/json"
@@ -12,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"syscall"
@@ -21,20 +21,13 @@ import (
 //go:embed payload.zip
 var payload []byte
 
-var tr = map[string]map[string]string{
-	"en": {"title": "FreeCraft Setup", "dir": "Installing to", "eng": "Downloading game engine...", "game": "Installing FreeCraft...", "lnk": "Creating shortcut...", "done": "Done! Start FreeCraft from your desktop.", "fail": "Engine download failed. Install Luanti from luanti.org, then copy %s\\games to its games folder.", "start": "Press Enter to start FreeCraft..."},
-	"de": {"title": "FreeCraft Setup", "dir": "Installation nach", "eng": "Spiel-Engine wird geladen...", "game": "FreeCraft wird installiert...", "lnk": "Verknüpfung wird erstellt...", "done": "Fertig! Starte FreeCraft über den Desktop.", "fail": "Engine-Download fehlgeschlagen. Installiere Luanti von luanti.org und kopiere %s\\games in dessen games-Ordner.", "start": "Enter drücken, um FreeCraft zu starten..."},
-	"fr": {"title": "Installation de FreeCraft", "dir": "Installation dans", "eng": "Téléchargement du moteur...", "game": "Installation de FreeCraft...", "lnk": "Création du raccourci...", "done": "Terminé ! Lancez FreeCraft depuis le bureau.", "fail": "Échec du téléchargement. Installez Luanti (luanti.org), puis copiez %s\\games dans son dossier games.", "start": "Entrée pour lancer FreeCraft..."},
-	"es": {"title": "Instalador de FreeCraft", "dir": "Instalando en", "eng": "Descargando motor...", "game": "Instalando FreeCraft...", "lnk": "Creando acceso directo...", "done": "¡Listo! Inicia FreeCraft desde el escritorio.", "fail": "Falló la descarga. Instala Luanti (luanti.org) y copia %s\\games a su carpeta games.", "start": "Pulsa Enter para iniciar FreeCraft..."},
-	"it": {"title": "Installazione di FreeCraft", "dir": "Installazione in", "eng": "Download del motore...", "game": "Installazione di FreeCraft...", "lnk": "Creazione del collegamento...", "done": "Fatto! Avvia FreeCraft dal desktop.", "fail": "Download non riuscito. Installa Luanti (luanti.org) e copia %s\\games nella sua cartella games.", "start": "Premi Invio per avviare FreeCraft..."},
-	"pt": {"title": "Instalador do FreeCraft", "dir": "Instalando em", "eng": "Baixando o motor...", "game": "Instalando o FreeCraft...", "lnk": "Criando atalho...", "done": "Pronto! Inicie o FreeCraft pela área de trabalho.", "fail": "Falha no download. Instale o Luanti (luanti.org) e copie %s\\games para a pasta games dele.", "start": "Pressione Enter para iniciar o FreeCraft..."},
-	"nl": {"title": "FreeCraft-installatie", "dir": "Installeren in", "eng": "Spel-engine downloaden...", "game": "FreeCraft installeren...", "lnk": "Snelkoppeling maken...", "done": "Klaar! Start FreeCraft vanaf je bureaublad.", "fail": "Download mislukt. Installeer Luanti (luanti.org) en kopieer %s\\games naar de games-map.", "start": "Druk op Enter om FreeCraft te starten..."},
-	"pl": {"title": "Instalator FreeCraft", "dir": "Instalacja w", "eng": "Pobieranie silnika...", "game": "Instalowanie FreeCraft...", "lnk": "Tworzenie skrótu...", "done": "Gotowe! Uruchom FreeCraft z pulpitu.", "fail": "Pobieranie nie powiodło się. Zainstaluj Luanti (luanti.org) i skopiuj %s\\games do jego folderu games.", "start": "Naciśnij Enter, aby uruchomić FreeCraft..."},
-	"ru": {"title": "Установка FreeCraft", "dir": "Установка в", "eng": "Загрузка движка...", "game": "Установка FreeCraft...", "lnk": "Создание ярлыка...", "done": "Готово! Запустите FreeCraft с рабочего стола.", "fail": "Не удалось загрузить движок. Установите Luanti (luanti.org) и скопируйте %s\\games в его папку games.", "start": "Нажмите Enter, чтобы запустить FreeCraft..."},
-	"tr": {"title": "FreeCraft Kurulumu", "dir": "Kurulum yeri", "eng": "Oyun motoru indiriliyor...", "game": "FreeCraft kuruluyor...", "lnk": "Kısayol oluşturuluyor...", "done": "Tamam! FreeCraft'ı masaüstünden başlat.", "fail": "İndirme başarısız. Luanti'yi (luanti.org) kur ve %s\\games klasörünü onun games klasörüne kopyala.", "start": "FreeCraft'ı başlatmak için Enter'a bas..."},
-	"ja": {"title": "FreeCraft セットアップ", "dir": "インストール先", "eng": "ゲームエンジン をダウンロード中...", "game": "FreeCraft をインストール中...", "lnk": "ショートカットを作成中...", "done": "完了！デスクトップから FreeCraft を起動してください。", "fail": "ダウンロードに失敗しました。Luanti (luanti.org) をインストールし、%s\\games を games フォルダにコピーしてください。", "start": "Enterキーで FreeCraft を起動..."},
-	"zh": {"title": "FreeCraft 安装程序", "dir": "安装到", "eng": "正在下载游戏引擎...", "game": "正在安装 FreeCraft...", "lnk": "正在创建快捷方式...", "done": "完成！请从桌面启动 FreeCraft。", "fail": "下载失败。请安装 Luanti (luanti.org)，然后将 %s\\games 复制到其 games 文件夹。", "start": "按 Enter 启动 FreeCraft..."},
-}
+//go:embed strings.json
+var strJSON []byte
+
+//go:embed setup.ps1
+var setupPS []byte
+
+var known = map[string]bool{"en": true, "de": true, "fr": true, "es": true, "it": true, "pt": true, "nl": true, "pl": true, "ru": true, "tr": true, "ja": true, "zh": true}
 
 func lang() string {
 	k := syscall.NewLazyDLL("kernel32.dll").NewProc("GetUserDefaultLocaleName")
@@ -44,20 +37,46 @@ func lang() string {
 		return "en"
 	}
 	l := strings.ToLower(syscall.UTF16ToString(buf))
-	if len(l) >= 2 {
-		if _, ok := tr[l[:2]]; ok {
-			return l[:2]
-		}
+	if len(l) >= 2 && known[l[:2]] {
+		return l[:2]
 	}
 	return "en"
 }
 
-func unzip(data []byte, dst, strip string) error {
+func hidden(name string, args ...string) *exec.Cmd {
+	c := exec.Command(name, args...)
+	c.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000}
+	return c
+}
+
+func copyDir(src, dst string) {
+	filepath.Walk(src, func(p string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		rel, _ := filepath.Rel(src, p)
+		t := filepath.Join(dst, rel)
+		if fi.IsDir() {
+			os.MkdirAll(t, 0o755)
+			return nil
+		}
+		b, e := os.ReadFile(p)
+		if e == nil {
+			os.WriteFile(t, b, 0o644)
+		}
+		return nil
+	})
+}
+
+func unzip(data []byte, dst, strip string, cb func(i, n int)) error {
 	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
 	if err != nil {
 		return err
 	}
-	for _, f := range zr.File {
+	for idx, f := range zr.File {
+		if cb != nil && idx%50 == 0 {
+			cb(idx, len(zr.File))
+		}
 		name := f.Name
 		if strip != "" {
 			name = strings.TrimPrefix(name, strip)
@@ -90,7 +109,7 @@ func unzip(data []byte, dst, strip string) error {
 	return nil
 }
 
-func engine(dst string) error {
+func engine(dst string, pr func(int, string)) error {
 	resp, err := http.Get("https://api.github.com/repos/luanti-org/luanti/releases/tags/5.18.0")
 	if err != nil {
 		return err
@@ -112,11 +131,24 @@ func engine(dst string) error {
 			if err != nil {
 				return err
 			}
-			data, err := io.ReadAll(r.Body)
-			r.Body.Close()
-			if err != nil {
-				return err
+			var buf bytes.Buffer
+			chunk := make([]byte, 64*1024)
+			for {
+				n, e := r.Body.Read(chunk)
+				buf.Write(chunk[:n])
+				if r.ContentLength > 0 {
+					pr(5+int(float64(buf.Len())/float64(r.ContentLength)*55), "eng")
+				}
+				if e == io.EOF {
+					break
+				}
+				if e != nil {
+					r.Body.Close()
+					return e
+				}
 			}
+			r.Body.Close()
+			data := buf.Bytes()
 			// Top-Ordner entfernen
 			zr, _ := zip.NewReader(bytes.NewReader(data), int64(len(data)))
 			strip := ""
@@ -125,7 +157,7 @@ func engine(dst string) error {
 					strip = zr.File[0].Name[:i+1]
 				}
 			}
-			return unzip(data, dst, strip)
+			return unzip(data, dst, strip, nil)
 		}
 	}
 	return fmt.Errorf("no win64 asset")
@@ -184,60 +216,88 @@ func rebrand(dst string) {
 	})
 }
 
-func main() {
-	syscall.NewLazyDLL("kernel32.dll").NewProc("SetConsoleOutputCP").Call(65001)
-	t := tr[lang()]
-	dst := filepath.Join(os.Getenv("LOCALAPPDATA"), "FreeCraft")
-	fmt.Println(t["title"])
-	if _, err := os.Stat(filepath.Join(dst, "Uninstall FreeCraft.bat")); err == nil {
-		q := "FreeCraft is already installed.  [Enter] = update/reinstall   [U] = uninstall: "
-		if lang() == "de" {
-			q = "FreeCraft ist bereits installiert.  [Enter] = aktualisieren   [U] = deinstallieren: "
-		}
-		fmt.Print(q)
-		a, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-		if strings.HasPrefix(strings.ToLower(strings.TrimSpace(a)), "u") {
-			c := exec.Command("cmd", "/c", "start", "", filepath.Join(dst, "Uninstall FreeCraft.bat"))
-			c.Dir = dst
-			c.Start()
-			return
-		}
-	}
-	fmt.Println(t["dir"], dst)
-	os.MkdirAll(dst, 0o755)
-	fmt.Println(t["eng"])
-	engErr := engine(dst)
-	if engErr == nil {
-		rebrand(dst)
-	}
-	fmt.Println(t["game"])
-	if err := unzip(payload, dst, "FreeCraft/"); err != nil {
-		fmt.Println(err)
-	}
-	tune(dst)
-	if engErr != nil {
-		fmt.Printf(t["fail"]+"\n", dst)
-		bufio.NewReader(os.Stdin).ReadString('\n')
+type workArgs struct{ Dst, Lang, User, Disp, Prog string }
+
+func setName(dst, user, disp string) {
+	p := filepath.Join(dst, "minetest.conf")
+	b, _ := os.ReadFile(p)
+	re := regexp.MustCompile(`(?m)^\s*(name|freecraft_display_name)\s*=.*\r?\n?`)
+	s := re.ReplaceAllString(string(b), "")
+	s += "\nname = " + user + "\nfreecraft_display_name = " + disp + "\n"
+	os.WriteFile(p, []byte(s), 0o644)
+}
+
+func worker(argf string) {
+	raw, err := os.ReadFile(argf)
+	if err != nil {
 		return
 	}
-	fmt.Println(t["lnk"])
-	exe := filepath.Join(dst, "FreeCraft.bat")
+	raw = bytes.TrimPrefix(raw, []byte("\xef\xbb\xbf"))
+	var a workArgs
+	if json.Unmarshal(raw, &a) != nil {
+		return
+	}
+	pr := func(p int, key string) { os.WriteFile(a.Prog, []byte(fmt.Sprintf("%d|%s", p, key)), 0o644) }
+	fail := func() { os.WriteFile(a.Prog, []byte("-1|fail"), 0o644) }
+	dst := a.Dst
+	os.MkdirAll(dst, 0o755)
+	pr(2, "eng")
+	if err := engine(dst, pr); err != nil {
+		fail()
+		return
+	}
+	rebrand(dst)
+	pr(62, "game")
+	if err := unzip(payload, dst, "FreeCraft/", func(i, n int) { pr(62+i*28/n, "game") }); err != nil {
+		fail()
+		return
+	}
+	os.Remove(filepath.Join(dst, "Uninstall FreeCraft.bat"))
+	tune(dst)
+	// gespeicherte Welten wiederherstellen
+	docs := filepath.Join(os.Getenv("USERPROFILE"), "Documents", "FreeCraft Saves")
+	if _, e := os.Stat(filepath.Join(dst, "worlds")); e != nil {
+		if _, e2 := os.Stat(filepath.Join(docs, "worlds")); e2 == nil {
+			copyDir(filepath.Join(docs, "worlds"), filepath.Join(dst, "worlds"))
+		}
+		if _, e2 := os.Stat(filepath.Join(docs, "client")); e2 == nil {
+			copyDir(filepath.Join(docs, "client"), filepath.Join(dst, "client"))
+		}
+	}
+	setName(dst, a.User, a.Disp)
+	pr(92, "lnk")
+	exe := filepath.Join(os.Getenv("SystemRoot"), "System32", "wscript.exe")
+	vbs := `"` + filepath.Join(dst, "FreeCraft.vbs") + `"`
 	ico := filepath.Join(dst, "freecraft.ico")
 	mk := func(name, target, args, wd string, style int) string {
 		return fmt.Sprintf(`$s=(New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath('Desktop')+'\%s.lnk');$s.TargetPath='%s';$s.Arguments='%s';$s.WorkingDirectory='%s';$s.IconLocation='%s';$s.WindowStyle=%d;$s.Save()`, name, target, args, wd, ico, style)
 	}
 	os.MkdirAll(filepath.Join(dst, "worlds"), 0o755)
-	ps := mk("FreeCraft", exe, "", dst, 7) + ";" + mk("FreeCraft Server", filepath.Join(dst, "FreeCraft Server.bat"), "", dst, 1) + ";" + mk("FreeCraft Worlds", filepath.Join(dst, "worlds"), "", dst, 1)
-	exec.Command("powershell", "-NoProfile", "-Command", ps).Run()
-	un := filepath.Join(dst, "Uninstall FreeCraft.bat")
+	ps := mk("FreeCraft", exe, vbs, dst, 1) + ";" + mk("FreeCraft Server", filepath.Join(dst, "FreeCraft Server.bat"), "", dst, 1) + ";" + mk("FreeCraft Worlds", filepath.Join(dst, "worlds"), "", dst, 1)
+	hidden("powershell", "-NoProfile", "-Command", ps).Run()
+	un := filepath.Join(dst, "Uninstall FreeCraft.exe")
 	key := `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\FreeCraft`
 	for _, kv := range [][2]string{{"DisplayName", "FreeCraft"}, {"Publisher", "JumpIn Games"}, {"DisplayVersion", "1.0"}, {"DisplayIcon", ico}, {"InstallLocation", dst}, {"UninstallString", `"` + un + `"`}} {
-		exec.Command("reg", "add", key, "/v", kv[0], "/d", kv[1], "/f").Run()
+		hidden("reg", "add", key, "/v", kv[0], "/d", kv[1], "/f").Run()
 	}
-	fmt.Println(t["done"])
-	fmt.Println(t["start"])
-	bufio.NewReader(os.Stdin).ReadString('\n')
-	c := exec.Command("cmd", "/c", exe)
-	c.Dir = dst
-	c.Start()
+	pr(100, "done")
+}
+
+func main() {
+	if len(os.Args) >= 3 && os.Args[1] == "--worker" {
+		worker(os.Args[2])
+		return
+	}
+	self, _ := os.Executable()
+	tmp := filepath.Join(os.TempDir(), "fc_setup")
+	os.MkdirAll(tmp, 0o755)
+	sj := filepath.Join(tmp, "strings.json")
+	os.WriteFile(sj, append([]byte("\xef\xbb\xbf"), strJSON...), 0o644)
+	ps := filepath.Join(tmp, "setup.ps1")
+	os.WriteFile(ps, setupPS, 0o644)
+	dst := filepath.Join(os.Getenv("LOCALAPPDATA"), "FreeCraft")
+	c := hidden("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA", "-WindowStyle", "Hidden", "-File", ps,
+		"-Exe", self, "-Dst", dst, "-StrFile", sj, "-SysLang", lang(),
+		"-ArgFile", filepath.Join(tmp, "args.json"), "-ProgFile", filepath.Join(tmp, "progress.txt"))
+	c.Run()
 }
